@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 export const revalidate = 60;
 
@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { data: news } = await supabase
     .from("news")
     .select("title, content, image_url, published_at")
-    .eq("slug", decodeURIComponent(slug))
+    .eq("slug", slug)
     .single();
 
   if (!news) return { title: "خبر غير موجود | يلا شوت نيو" };
@@ -80,7 +80,7 @@ export default async function NewsDetailsPage({ params }: { params: Promise<{ sl
   const { data: news } = await supabase
     .from("news")
     .select("*")
-    .eq("slug", decodeURIComponent(slug))
+    .eq("slug", slug)
     .single();
 
   if (!news) {
@@ -95,7 +95,14 @@ export default async function NewsDetailsPage({ params }: { params: Promise<{ sl
     timeZone: "Africa/Cairo"
   });
 
-  const sanitizedContent = DOMPurify.sanitize(news.content || "التفاصيل غير متاحة حالياً.");
+  const sanitizedContent = sanitizeHtml(news.content || "التفاصيل غير متاحة حالياً.", {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img', 'iframe' ]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      'img': [ 'src', 'alt' ],
+      'iframe': [ 'src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen' ]
+    }
+  });
 
   return (
     <div className="container mx-auto px-4 py-8 flex-1 max-w-4xl">

@@ -12,8 +12,9 @@ export default function Footer() {
 
         {/* Links */}
         <div className="flex items-center gap-6 text-sm text-[var(--color-text-muted)] font-tajawal">
+          <Link href="/about" className="hover:text-[var(--color-text-primary)] transition-colors">من نحن</Link>
           <Link href="/privacy" className="hover:text-[var(--color-text-primary)] transition-colors">سياسة الخصوصية</Link>
-          <Link href="/terms" className="hover:text-[var(--color-text-primary)] transition-colors">شروط الاستخدام</Link>
+          <Link href="/terms" className="hover:text-[var(--color-text-primary)] transition-colors">الشروط والأحكام</Link>
           <Link href="/contact" className="hover:text-[var(--color-text-primary)] transition-colors">اتصل بنا</Link>
         </div>
 

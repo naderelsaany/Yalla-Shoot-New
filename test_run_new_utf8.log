@@ -1,0 +1,102 @@
+﻿
+Running 120 tests using 6 workers
+
+[1/120] [chromium] › e2e\banner.spec.ts:29:7 › Sticky Live Score Banner (Tier 1) › User can close/minimize the banner
+[2/120] [chromium] › e2e\banner.spec.ts:13:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on homepage
+[3/120] [chromium] › e2e\banner.spec.ts:19:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on matches page
+[4/120] [chromium] › e2e\banner.spec.ts:35:7 › Sticky Live Score Banner (Tier 1) › Sticky banner handles mobile layout
+[5/120] [chromium] › e2e\banner.spec.ts:24:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on match details page
+[6/120] [chromium] › e2e\banner.spec.ts:44:7 › Sticky Live Score Banner (Tier 2 - Boundaries & Error Cases) › Banner behaviour when no live matches are active
+[chromium] › e2e\banner.spec.ts:44:7 › Sticky Live Score Banner (Tier 2 - Boundaries & Error Cases) › Banner behaviour when no live matches are active
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:13:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on homepage
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:35:7 › Sticky Live Score Banner (Tier 1) › Sticky banner handles mobile layout
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:29:7 › Sticky Live Score Banner (Tier 1) › User can close/minimize the banner
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:13:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on homepage
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:29:7 › Sticky Live Score Banner (Tier 1) › User can close/minimize the banner
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:13:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on homepage
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:29:7 › Sticky Live Score Banner (Tier 1) › User can close/minimize the banner
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:13:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on homepage
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:29:7 › Sticky Live Score Banner (Tier 1) › User can close/minimize the banner
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:13:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on homepage
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:29:7 › Sticky Live Score Banner (Tier 1) › User can close/minimize the banner
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+[chromium] › e2e\banner.spec.ts:35:7 › Sticky Live Score Banner (Tier 1) › Sticky banner handles mobile layout
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+PAGE LOG: Failed to load resource: net::ERR_CONNECTION_RESET
+
+  1) [chromium] › e2e\banner.spec.ts:24:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on match details page 
+
+    Error: page.goto: net::ERR_CONNECTION_RESET at http://localhost:3000/match/1
+    Call log:
+      - navigating to "http://localhost:3000/match/1", waiting until "load"
+
+
+      23 |
+      24 |   test('Banner is visible on match details page', async ({ page }) => {
+    > 25 |     await page.goto('/match/1');
+         |                ^
+      26 |     await expect(page.locator('[data-testid="live-banner"]')).toBeVisible();
+      27 |   });
+      28 |
+        at C:\Users\naderelsadany\Desktop\Yalla Shoot New\e2e\banner.spec.ts:25:16
+
+    Error Context: test-results\banner-Sticky-Live-Score-B-70483-sible-on-match-details-page-chromium\error-context.md
+
+
+  2) [chromium] › e2e\banner.spec.ts:19:7 › Sticky Live Score Banner (Tier 1) › Banner is visible on matches page 
+
+    Error: page.goto: net::ERR_CONNECTION_RESET at http://localhost:3000/matches
+    Call log:
+      - navigating to "http://localhost:3000/matches", waiting until "load"
+
+
+      18 |
+      19 |   test('Banner is visible on matches page', async ({ page }) => {
+    > 20 |     await page.goto('/matches');
+         |                ^
+      21 |     await expect(page.locator('[data-testid="live-banner"]')).toBeVisible();
+      22 |   });
+      23 |
+        at C:\Users\naderelsadany\Desktop\Yalla Shoot New\e2e\banner.spec.ts:20:16
+
+    Error Context: test-results\banner-Sticky-Live-Score-B-4a388--is-visible-on-matches-page-chromium\error-context.md
+
+
+[7/120] [chromium] › e2e\banner.spec.ts:59:7 › Sticky Live Score Banner (Tier 2 - Boundaries & Error Cases) › API failure handles gracefully without breaking banner
+[8/120] [chromium] › e2e\banner.spec.ts:69:7 › Sticky Live Score Banner (Tier 2 - Boundaries & Error Cases) › Banner handles screen size smaller than 320px cleanly
