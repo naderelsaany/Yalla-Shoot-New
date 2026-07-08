@@ -1,14 +1,14 @@
 import Link from 'next/link';
 import TeamLogo from './TeamLogo';
 
-interface MatchCardProps {
+export interface MatchCardProps {
   id: string;
   homeTeam: string;
   awayTeam: string;
   homeLogo?: string;
   awayLogo?: string;
-  homeScore?: number;
-  awayScore?: number;
+  homeScore?: number | null;
+  awayScore?: number | null;
   time: string;
   status: 'SCHEDULED' | 'TIMED' | 'IN_PLAY' | 'PAUSED' | 'FINISHED' | 'SUSPENDED' | 'POSTPONED' | 'CANCELLED' | 'AWARDED';
   league: string;

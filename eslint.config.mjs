@@ -12,7 +12,19 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "*.js",
+    "scripts/**/*.js",
+    "test-results/**",
+    "playwright-report/**",
+    "e2e/**",
+    ".agents/**",
   ]),
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": "error",
+    },
+  },
 ]);
 
 export default eslintConfig;

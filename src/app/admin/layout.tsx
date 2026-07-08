@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default async function AdminLayout({
   children,
 }: {
@@ -8,7 +10,7 @@ export default async function AdminLayout({
       {/* Optional: Add a custom Admin header here */}
       <div className="bg-black/20 border-b border-[var(--color-border-subtle)] p-4 flex items-center justify-between">
         <h1 className="font-bold text-xl text-[var(--color-accent)] font-arabic">Yalla Shoot Admin</h1>
-        <a href="/" className="text-sm hover:underline">العودة للموقع</a>
+        <Link href="/" className="text-sm hover:underline">العودة للموقع</Link>
       </div>
       <div className="p-4 md:p-8">
         {children}

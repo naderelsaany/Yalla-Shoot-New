@@ -28,6 +28,7 @@ export default function Header() {
           <Link href="/matches" className="hover:text-[var(--color-accent)] transition-colors">المباريات</Link>
           <Link href="/news" className="hover:text-[var(--color-accent)] transition-colors">الأخبار</Link>
           <Link href="/leagues" className="hover:text-[var(--color-accent)] transition-colors">البطولات</Link>
+          <Link href="/world-cup" className="hover:text-[var(--color-accent)] transition-colors">كأس العالم</Link>
         </nav>
       </div>
     </header>

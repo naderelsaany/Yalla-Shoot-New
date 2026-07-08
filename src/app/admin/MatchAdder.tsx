@@ -63,8 +63,8 @@ export default function MatchAdder({ leagues, teams }: MatchAdderProps) {
         away_score: '',
         video_url: ''
       }));
-    } catch (err: any) {
-      alert(`خطأ: ${err.message}`);
+    } catch (err) {
+      alert(`خطأ: ${err instanceof Error ? err.message : 'حدث خطأ غير معروف'}`);
     } finally {
       setLoading(false);
     }

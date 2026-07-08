@@ -7,7 +7,7 @@ const protectedPrefixes = ['/admin', '/api/admin'];
 // Routes that bypass protection
 const publicRoutes = ['/admin/login', '/api/admin/login'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if it's a protected route
@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
       
       // Token is valid, proceed
       return NextResponse.next();
-    } catch (error) {
+    } catch {
       // Invalid token
       if (pathname.startsWith('/api/')) {
         return NextResponse.json({ success: false, message: 'الجلسة انتهت أو غير صالحة' }, { status: 401 });

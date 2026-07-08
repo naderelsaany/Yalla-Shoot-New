@@ -4,26 +4,29 @@ import TeamLogo from "@/components/TeamLogo";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { MatchWithTeams } from "@/types/database";
 
 export const revalidate = 30;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const { data: match } = await supabase
+  const { data: matchData } = await supabase
     .from("matches")
     .select(`
-      home_team:teams!matches_home_team_id_fkey(name),
-      away_team:teams!matches_away_team_id_fkey(name),
+      home_team:teams!matches_home_team_id_fkey(id, name),
+      away_team:teams!matches_away_team_id_fkey(id, name),
       league:leagues(name)
     `)
     .eq("id", id)
     .single();
 
+  const match = matchData as unknown as MatchWithTeams | null;
+
   if (!match) return { title: "مباراة غير موجودة | يلا شوت نيو" };
 
-  const home = translateName((match.home_team as any)?.name || "");
-  const away = translateName((match.away_team as any)?.name || "");
-  const league = translateName((match.league as any)?.name || "");
+  const home = translateName(match.home_team?.name || "");
+  const away = translateName(match.away_team?.name || "");
+  const league = translateName(match.league?.name || "");
 
   return {
     title: `مباراة ${home} ضد ${away} | ${league}`,
@@ -40,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-function MatchStructuredData({ match }: { match: any }) {
+function MatchStructuredData({ match }: { match: MatchWithTeams }) {
   const homeName = translateName(match.home_team?.name || "");
   const awayName = translateName(match.away_team?.name || "");
   const leagueName = translateName(match.league?.name || "");
@@ -124,7 +127,7 @@ function BreadcrumbStructuredData({ leagueName, matchTitle }: { leagueName: stri
 export default async function MatchDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const { data: match } = await supabase
+  const { data: matchData } = await supabase
     .from("matches")
     .select(`
       id,
@@ -132,15 +135,59 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
       status,
       home_score,
       away_score,
-      home_team:teams!matches_home_team_id_fkey(name, logo_url),
-      away_team:teams!matches_away_team_id_fkey(name, logo_url),
+      home_team:teams!matches_home_team_id_fkey(id, name, logo_url),
+      away_team:teams!matches_away_team_id_fkey(id, name, logo_url),
       league:leagues(name)
     `)
     .eq("id", id)
     .single();
 
+  const match = matchData as unknown as MatchWithTeams | null;
+
   if (!match) {
     notFound();
+  }
+
+  interface SimplePlayer {
+    id: string;
+    name: string;
+  }
+
+  let homePlayers: SimplePlayer[] = [];
+  let awayPlayers: SimplePlayer[] = [];
+
+  if (match.home_team?.name) {
+    try {
+      const { data } = await supabase
+        .from("players")
+        .select("id, name")
+        .or(`club.eq."${match.home_team.name}",national_team.eq."${match.home_team.name}"`);
+      homePlayers = data || [];
+      if (homePlayers.length === 0) {
+        const { data: data2 } = await supabase
+          .from("players")
+          .select("id, name")
+          .eq("club", match.home_team.name);
+        homePlayers = data2 || [];
+      }
+    } catch {}
+  }
+
+  if (match.away_team?.name) {
+    try {
+      const { data } = await supabase
+        .from("players")
+        .select("id, name")
+        .or(`club.eq."${match.away_team.name}",national_team.eq."${match.away_team.name}"`);
+      awayPlayers = data || [];
+      if (awayPlayers.length === 0) {
+        const { data: data2 } = await supabase
+          .from("players")
+          .select("id, name")
+          .eq("club", match.away_team.name);
+        awayPlayers = data2 || [];
+      }
+    } catch {}
   }
 
   const dateObj = new Date(match.match_date);
@@ -153,9 +200,9 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
     timeZone: "Africa/Cairo"
   });
 
-  const homeName = translateName((match.home_team as any)?.name || "");
-  const awayName = translateName((match.away_team as any)?.name || "");
-  const leagueName = translateName((match.league as any)?.name || "");
+  const homeName = translateName(match.home_team?.name || "");
+  const awayName = translateName(match.away_team?.name || "");
+  const leagueName = translateName(match.league?.name || "");
 
   return (
     <div className="container mx-auto px-4 py-8 flex-1 max-w-4xl">
@@ -181,10 +228,14 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
         </div>
 
         <div className="flex items-center justify-between">
-          <div className="flex flex-col items-center gap-4 flex-1">
-            <TeamLogo src={(match.home_team as any)?.logo_url} alt={homeName} size="lg" />
+          <Link
+            href={`/teams/${match.home_team?.id || 'ahly'}`}
+            data-testid="team-link-home"
+            className="flex flex-col items-center gap-4 flex-1 hover:text-[var(--color-accent)] transition-colors"
+          >
+            <TeamLogo src={match.home_team?.logo_url ?? undefined} alt={homeName} size="lg" />
             <span className="text-lg md:text-2xl font-bold text-center text-[var(--color-text-primary)]">{homeName}</span>
-          </div>
+          </Link>
 
           <div className="flex-1 flex flex-col items-center justify-center">
             {match.status === "SCHEDULED" ? (
@@ -211,9 +262,51 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
             )}
           </div>
 
-          <div className="flex flex-col items-center gap-4 flex-1">
-            <TeamLogo src={(match.away_team as any)?.logo_url} alt={awayName} size="lg" />
+          <Link
+            href={`/teams/${match.away_team?.id || 'ahly'}`}
+            data-testid="team-link-away"
+            className="flex flex-col items-center gap-4 flex-1 hover:text-[var(--color-accent)] transition-colors"
+          >
+            <TeamLogo src={match.away_team?.logo_url ?? undefined} alt={awayName} size="lg" />
             <span className="text-lg md:text-2xl font-bold text-center text-[var(--color-text-primary)]">{awayName}</span>
+          </Link>
+        </div>
+      </div>
+
+      <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-6 shadow-sm mb-8">
+        <h2 className="text-lg font-bold font-arabic text-[var(--color-text-primary)] mb-4">قائمة اللاعبين (التشكيل)</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h3 className="font-bold text-sm text-[var(--color-text-secondary)] mb-2">تشكيلة أصحاب الأرض</h3>
+            <ul>
+              {homePlayers.length === 0 ? (
+                <li className="text-xs text-[var(--color-text-muted)]">لا يوجد لاعبين مسجلين</li>
+              ) : (
+                homePlayers.map((p) => (
+                  <li key={p.id} className="mb-1">
+                    <Link href={`/players/${p.id}`} data-testid="player-link" className="text-[var(--color-accent)] hover:underline">
+                      {p.name}
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-[var(--color-text-secondary)] mb-2">تشكيلة الضيوف</h3>
+            <ul>
+              {awayPlayers.length === 0 ? (
+                <li className="text-xs text-[var(--color-text-muted)]">لا يوجد لاعبين مسجلين</li>
+              ) : (
+                awayPlayers.map((p) => (
+                  <li key={p.id} className="mb-1">
+                    <Link href={`/players/${p.id}`} data-testid="player-link" className="text-[var(--color-accent)] hover:underline">
+                      {p.name}
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
           </div>
         </div>
       </div>

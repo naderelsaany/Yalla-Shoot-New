@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, message: 'تم حفظ المباراة بنجاح' });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error adding match:', error);
     return NextResponse.json({ success: false, message: 'حدث خطأ أثناء الحفظ' }, { status: 500 });
   }

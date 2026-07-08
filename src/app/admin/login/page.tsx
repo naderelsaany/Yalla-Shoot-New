@@ -29,6 +29,7 @@ export default function AdminLogin() {
         setError(data.message);
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('حدث خطأ في الاتصال');
     } finally {
       setLoading(false);

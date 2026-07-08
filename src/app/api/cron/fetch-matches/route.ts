@@ -3,7 +3,7 @@ import { getServiceSupabase } from '@/lib/supabase';
 
 const API_KEY = process.env.FOOTBALL_DATA_API_KEY;
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     if (!API_KEY) {
       return NextResponse.json({ error: 'API Key not configured' }, { status: 500 });
@@ -114,8 +114,8 @@ export async function GET(request: Request) {
       success: true, 
       message: `Processed ${data.matches.length} matches. Inserted ${insertedMatches} new matches.` 
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Cron Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }

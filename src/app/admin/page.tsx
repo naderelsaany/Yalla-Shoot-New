@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { getServiceSupabase } from '@/lib/supabase';
 import MatchesManager from './MatchesManager';
 import NewsManager from './NewsManager';

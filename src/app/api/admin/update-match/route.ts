@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
 import { cookies } from 'next/headers';
+import { Match } from '@/types/database';
 
 export async function POST(request: Request) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
 
     const supabaseAdmin = getServiceSupabase();
     
-    const updatePayload: any = { video_url: video_url || null };
+    const updatePayload: Partial<Match> = { video_url: video_url || null };
     if (status !== undefined) updatePayload.status = status;
     if (home_score !== undefined) updatePayload.home_score = home_score !== '' ? parseInt(home_score) : null;
     if (away_score !== undefined) updatePayload.away_score = away_score !== '' ? parseInt(away_score) : null;
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Update match error:', error);
     return NextResponse.json({ success: false, message: 'حدث خطأ' }, { status: 500 });
   }
 }

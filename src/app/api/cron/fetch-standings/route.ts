@@ -16,7 +16,7 @@ const COMPETITIONS = [
   { id: 2013, name: 'Campeonato Brasileiro Série A' },
 ];
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     if (!API_KEY) {
       return NextResponse.json({ error: 'API Key not configured' }, { status: 500 });
@@ -110,8 +110,8 @@ export async function GET(request: Request) {
       success: true, 
       message: `Processed standings. Updated ${updatedStandings} team rows.` 
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Standings Cron Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }

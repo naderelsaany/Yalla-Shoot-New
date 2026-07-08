@@ -1,6 +1,7 @@
 import LiveMatchesList from '@/components/LiveMatchesList';
 import { supabase } from '@/lib/supabase';
 import { translateName } from '@/lib/translations';
+import { MatchWithTeams } from '@/types/database';
 
 import { Metadata } from 'next';
 
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 // JSON-LD للصفحة الرئيسية - SportsEvent list
-function HomeStructuredData({ matches }: { matches: any[] }) {
+function HomeStructuredData({ matches }: { matches: MatchWithTeams[] }) {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -60,11 +61,13 @@ function HomeStructuredData({ matches }: { matches: any[] }) {
   );
 }
 
+const getRecentTime = () => new Date(Date.now() - 14 * 60 * 60 * 1000);
+
 export default async function Home() {
   // Fetch recent and upcoming matches (starting from 14 hours ago to cover today's finished matches)
-  const recentTime = new Date(Date.now() - 14 * 60 * 60 * 1000);
+  const recentTime = getRecentTime();
 
-  const { data: matches } = await supabase
+  const { data: matchesData } = await supabase
     .from('matches')
     .select(`
       id,
@@ -79,6 +82,8 @@ export default async function Home() {
     .gte('match_date', recentTime.toISOString())
     .order('match_date', { ascending: true })
     .limit(15);
+
+  const matches = matchesData as unknown as MatchWithTeams[] | null;
 
   return (
     <div className="flex-1 flex flex-col">

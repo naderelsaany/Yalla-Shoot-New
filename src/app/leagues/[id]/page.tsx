@@ -5,6 +5,7 @@ import MatchCard from '@/components/MatchCard';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { League, StandingWithTeam, MatchWithTeams } from '@/types/database';
 
 export const revalidate = 60; // Refresh every minute since we have matches now
 
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-function LeagueStructuredData({ league, standings, leagueName, id }: { league: any; standings: any[]; leagueName: string; id: string }) {
+function LeagueStructuredData({ standings, leagueName, id }: { league: League; standings: StandingWithTeam[]; leagueName: string; id: string }) {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'SportsOrganization',
@@ -121,8 +122,8 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
   const leagueName = translateName(league.name);
 
   // Split matches
-  const pastMatches = (matches || []).filter(m => m.status === 'FINISHED').reverse(); // Newest past matches first
-  const upcomingMatches = (matches || []).filter(m => m.status !== 'FINISHED');
+  const pastMatches = (matches || []).filter((m: MatchWithTeams) => m.status === 'FINISHED').reverse(); // Newest past matches first
+  const upcomingMatches = (matches || []).filter((m: MatchWithTeams) => m.status !== 'FINISHED');
 
   return (
     <div className="container mx-auto px-4 py-8 flex-1 max-w-5xl">
@@ -160,7 +161,7 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
             <h2 className="text-2xl font-bold font-tajawal mb-6">المباريات القادمة / الجارية</h2>
             {upcomingMatches.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {upcomingMatches.map(match => {
+                {upcomingMatches.map((match: MatchWithTeams) => {
                   const dateObj = new Date(match.match_date);
                   const timeString = dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' });
                   const dateString = dateObj.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric', timeZone: 'Africa/Cairo' });
@@ -171,12 +172,12 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
                       league={leagueName}
                       homeTeam={translateName(match.home_team?.name || '')}
                       awayTeam={translateName(match.away_team?.name || '')}
-                      homeLogo={match.home_team?.logo_url}
-                      awayLogo={match.away_team?.logo_url}
+                      homeLogo={match.home_team?.logo_url || undefined}
+                      awayLogo={match.away_team?.logo_url || undefined}
                       homeScore={match.home_score}
                       awayScore={match.away_score}
                       time={`${dateString} - ${timeString}`}
-                      status={match.status as any}
+                      status={match.status as 'SCHEDULED' | 'TIMED' | 'IN_PLAY' | 'PAUSED' | 'FINISHED' | 'SUSPENDED' | 'POSTPONED' | 'CANCELLED' | 'AWARDED'}
                     />
                   )
                 })}
@@ -193,7 +194,7 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
             <h2 className="text-2xl font-bold font-tajawal mb-6">أحدث النتائج (مباريات سابقة)</h2>
             {pastMatches.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-80 hover:opacity-100 transition-opacity">
-                {pastMatches.map(match => {
+                {pastMatches.map((match: MatchWithTeams) => {
                   const dateObj = new Date(match.match_date);
                   const dateString = dateObj.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Africa/Cairo' });
                   return (
@@ -203,12 +204,12 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
                       league={leagueName}
                       homeTeam={translateName(match.home_team?.name || '')}
                       awayTeam={translateName(match.away_team?.name || '')}
-                      homeLogo={match.home_team?.logo_url}
-                      awayLogo={match.away_team?.logo_url}
+                      homeLogo={match.home_team?.logo_url || undefined}
+                      awayLogo={match.away_team?.logo_url || undefined}
                       homeScore={match.home_score}
                       awayScore={match.away_score}
                       time={dateString}
-                      status={match.status as any}
+                      status={match.status as 'SCHEDULED' | 'TIMED' | 'IN_PLAY' | 'PAUSED' | 'FINISHED' | 'SUSPENDED' | 'POSTPONED' | 'CANCELLED' | 'AWARDED'}
                     />
                   )
                 })}
@@ -239,12 +240,12 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--color-border-subtle)]">
-                      {standings.map((row) => (
+                      {standings.map((row: StandingWithTeam) => (
                         <tr key={row.id} className="hover:bg-[var(--color-bg-card)] transition-colors">
                           <td className="px-2 py-3 text-center font-bold text-[var(--color-text-muted)]">{row.position}</td>
                           <td className="px-2 py-3">
                             <div className="flex items-center gap-2">
-                              <TeamLogo src={row.teams?.logo_url} alt={row.teams?.name} size="sm" />
+                              <TeamLogo src={row.teams?.logo_url || undefined} alt={row.teams?.name || ''} size="sm" />
                               <span className="font-bold text-[var(--color-text-primary)] truncate max-w-[100px]">{translateName(row.teams?.name || '')}</span>
                             </div>
                           </td>

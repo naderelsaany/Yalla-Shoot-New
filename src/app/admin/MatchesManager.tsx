@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { MatchWithTeams } from '@/types/database';
 
-export default function MatchesManager({ initialMatches }: { initialMatches: any[] }) {
+export default function MatchesManager({ initialMatches }: { initialMatches: MatchWithTeams[] }) {
   const [matches, setMatches] = useState(initialMatches);
   const [saving, setSaving] = useState<string | null>(null);
 
@@ -34,17 +35,19 @@ export default function MatchesManager({ initialMatches }: { initialMatches: any
       if (match.status === 'FINISHED') {
          setMatches(matches.filter(m => m.id !== id));
       }
-    } catch (err) {
+    } catch {
       alert('حدث خطأ أثناء التحديث.');
     } finally {
       setSaving(null);
     }
   };
 
-  const updateMatchState = (id: string, field: string, value: any) => {
+  const updateMatchState = (id: string, field: keyof MatchWithTeams, value: unknown) => {
     const newMatches = [...matches];
     const m = newMatches.find(x => x.id === id);
-    if (m) m[field] = value;
+    if (m) {
+      (m as unknown as Record<string, unknown>)[field as string] = value;
+    }
     setMatches(newMatches);
   };
 

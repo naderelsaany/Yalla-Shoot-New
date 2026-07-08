@@ -3,8 +3,10 @@ import { Cairo, Tajawal } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LiveScoreTicker from "@/components/LiveScoreTicker";
+import LiveScoreBanner from "@/components/LiveScoreBanner";
 import { supabase } from "@/lib/supabase";
 import { unstable_cache } from "next/cache";
+import { News } from "@/types/database";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -136,7 +138,7 @@ function StructuredData() {
 const getNewsTitles = unstable_cache(
   async () => {
     const { data } = await supabase.from('news').select('title').order('published_at', { ascending: false }).limit(5);
-    return data?.map(item => item.title) || [];
+    return data?.map((item: Pick<News, 'title'>) => item.title) || [];
   },
   ['news-titles-layout'],
   { revalidate: 60 } // cache for 60 seconds
@@ -152,6 +154,9 @@ export default async function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} ${tajawal.variable}`}>
       <head>
+        {process.env.PLAYWRIGHT_TEST === 'true' && (
+          <script dangerouslySetInnerHTML={{ __html: 'window.PLAYWRIGHT_TEST = true;' }} />
+        )}
         <StructuredData />
       </head>
       <body className="antialiased selection:bg-[var(--color-accent)] selection:text-white min-h-screen flex flex-col bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
@@ -159,6 +164,7 @@ export default async function RootLayout({
         <LiveScoreTicker news={newsHeadlines} />
         {children}
         <Footer />
+        <LiveScoreBanner />
       </body>
     </html>
   );

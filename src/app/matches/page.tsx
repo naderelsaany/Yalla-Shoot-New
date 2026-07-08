@@ -1,8 +1,9 @@
 import { supabase } from '@/lib/supabase';
 import { translateName } from '@/lib/translations';
-import MatchCard from '@/components/MatchCard';
+import MatchCard, { MatchCardProps } from '@/components/MatchCard';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { MatchWithTeams } from '@/types/database';
 
 export const metadata: Metadata = {
   title: 'جدول المباريات | يلا شوت نيو',
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
-function MatchesStructuredData({ matches }: { matches: any[] }) {
+function MatchesStructuredData({ matches }: { matches: MatchWithTeams[] }) {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -79,8 +80,14 @@ export default async function MatchesPage({
   // ✅ إصلاح: استخدام التوقيت المحلي بشكل صحيح
   let targetDate: Date;
   if (date) {
-    const [year, month, day] = date.split('-').map(Number);
-    targetDate = new Date(year, month - 1, day);
+    const parts = date.split('-');
+    if (parts.length === 3) {
+      const [year, month, day] = parts.map(Number);
+      const parsedDate = new Date(year, month - 1, day);
+      targetDate = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+    } else {
+      targetDate = new Date();
+    }
   } else {
     targetDate = new Date();
   }
@@ -94,7 +101,7 @@ export default async function MatchesPage({
   const from = (currentPage - 1) * itemsPerPage;
   const to = from + itemsPerPage - 1;
 
-  const { data: matches, count } = await supabase
+  const { data: matchesData, count } = await supabase
     .from('matches')
     .select(`
       id,
@@ -111,9 +118,11 @@ export default async function MatchesPage({
     .order('match_date', { ascending: true })
     .range(from, to);
 
+  const matches = matchesData as unknown as MatchWithTeams[] | null;
+
   const totalPages = Math.ceil((count || 0) / itemsPerPage);
 
-  const groupedMatches = matches?.reduce((acc: any, match: any) => {
+  const groupedMatches = matches?.reduce<Record<string, MatchWithTeams[]>>((acc, match) => {
     const leagueName = translateName(match.league?.name || 'بطولة أخرى');
     if (!acc[leagueName]) acc[leagueName] = [];
     acc[leagueName].push(match);
@@ -167,7 +176,7 @@ export default async function MatchesPage({
               {league}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {groupedMatches[league].map((match: any) => {
+              {groupedMatches[league].map((match) => {
                 const dateObj = new Date(match.match_date);
                 const timeString = dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' });
                 
@@ -177,12 +186,12 @@ export default async function MatchesPage({
                     id={match.id}
                     homeTeam={translateName(match.home_team?.name || 'فريق')}
                     awayTeam={translateName(match.away_team?.name || 'فريق')}
-                    homeLogo={match.home_team?.logo_url}
-                    awayLogo={match.away_team?.logo_url}
+                    homeLogo={match.home_team?.logo_url ?? undefined}
+                    awayLogo={match.away_team?.logo_url ?? undefined}
                     homeScore={match.home_score}
                     awayScore={match.away_score}
                     time={timeString}
-                    status={match.status as any}
+                    status={match.status as MatchCardProps['status']}
                     league={translateName(match.league?.name || 'بطولة')}
                   />
                 );

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { News } from '@/types/database';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -73,7 +74,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {newsItems && newsItems.length > 0 ? (
-          newsItems.map((news) => {
+          newsItems.map((news: News) => {
             const dateObj = new Date(news.published_at);
             const dateString = dateObj.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Africa/Cairo' });
             

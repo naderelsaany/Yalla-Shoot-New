@@ -34,7 +34,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-function NewsArticleStructuredData({ news }: { news: any }) {
+import { News } from "@/types/database";
+
+function NewsArticleStructuredData({ news }: { news: News }) {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",

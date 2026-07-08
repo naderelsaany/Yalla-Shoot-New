@@ -129,6 +129,20 @@ CREATE TABLE public.user_bookmarks (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+-- 10. players (اللاعبين)
+CREATE TABLE public.players (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  club TEXT,
+  national_team TEXT,
+  goals INTEGER DEFAULT 0,
+  assists INTEGER DEFAULT 0,
+  yellow_cards INTEGER DEFAULT 0,
+  red_cards INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
 
 -- الفهارس الموصى بها (Indexes) لأداء أفضل
 CREATE INDEX idx_matches_date ON public.matches(match_date);
@@ -148,12 +162,14 @@ ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.news ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.standings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.players ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow public read access to leagues" ON public.leagues FOR SELECT USING (true);
 CREATE POLICY "Allow public read access to teams" ON public.teams FOR SELECT USING (true);
 CREATE POLICY "Allow public read access to matches" ON public.matches FOR SELECT USING (true);
 CREATE POLICY "Allow public read access to news" ON public.news FOR SELECT USING (true);
 CREATE POLICY "Allow public read access to standings" ON public.standings FOR SELECT USING (true);
+CREATE POLICY "Allow public read access to players" ON public.players FOR SELECT USING (true);
 
 -- Enable Realtime for Matches table
 alter publication supabase_realtime add table matches;

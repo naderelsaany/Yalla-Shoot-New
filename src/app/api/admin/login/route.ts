@@ -35,6 +35,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: false, message: 'كلمة المرور غير صحيحة' }, { status: 401 });
   } catch (error) {
+    console.error('Login route error:', error);
     return NextResponse.json({ success: false, message: 'حدث خطأ' }, { status: 500 });
   }
 }

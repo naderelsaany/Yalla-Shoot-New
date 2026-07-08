@@ -26,8 +26,8 @@ export default function NewsManager() {
       setTitle('');
       setContent('');
       setImageUrl('');
-    } catch (err: any) {
-      alert('حدث خطأ: ' + err.message);
+    } catch (err) {
+      alert('حدث خطأ: ' + (err instanceof Error ? err.message : 'حدث خطأ غير معروف'));
     } finally {
       setSaving(false);
     }
