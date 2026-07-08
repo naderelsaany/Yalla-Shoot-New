@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     creator: "@yallashootnew",
   },
   verification: {
-    google: "YOUR_GOOGLE_SEARCH_CONSOLE_CODE",
+    google: "cNHfGJiXXVT2uaJ8q7mofplDpWfTNvatP1Sqsz6syiU",
   },
   alternates: {
     canonical: "https://yallashootnew.com",
