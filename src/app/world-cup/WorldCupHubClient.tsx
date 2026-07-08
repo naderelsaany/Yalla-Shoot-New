@@ -4,6 +4,10 @@ import React, { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import MatchCard from "@/components/MatchCard";
+import { translateName } from "@/lib/translations";
+import { TournamentBracket } from "@/components/TournamentBracket/TournamentBracket";
+import { generateMockMatches } from "@/components/TournamentBracket/utils/mockData";
 
 interface StandingRow {
   id: string;
@@ -207,6 +211,11 @@ function WorldCupHubContent() {
         </section>
       </div>
 
+      {/* Tournament Bracket Section (Knockout) */}
+      <section className="mt-12 bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-3xl p-6 shadow-sm overflow-hidden">
+        <TournamentBracket matches={generateMockMatches()} tournamentName="كأس العالم" />
+      </section>
+
       {/* Matches Section */}
       <section className="mt-12 bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-3xl p-6 shadow-sm">
         <h2 className="text-xl font-bold font-arabic text-[var(--color-text-primary)] mb-6 pb-2 border-b border-[var(--color-border-subtle)]">
@@ -236,35 +245,26 @@ function WorldCupHubContent() {
                 if (weightA === 0) return dateB - dateA; // Finished: newest first
                 return dateA - dateB; // Upcoming: closest first
               })
-              .map((match) => (
-              <Link
-                key={match.id}
-                href={`/match/${match.id}`}
-                data-testid="wc-match-card"
-                className="border border-[var(--color-border-subtle)] rounded-2xl p-5 hover:border-[var(--color-accent)] transition-all flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between text-xs text-[var(--color-text-muted)] mb-3">
-                  <span>{match.league?.name || 'كأس العالم'}</span>
-                  <span>{new Date(match.match_date).toLocaleDateString('ar-EG')}</span>
-                </div>
-                <div className="flex items-center justify-between gap-4 my-2">
-                  <div className="flex-1 text-center font-bold">
-                    <p>{match.home_team?.name}</p>
-                  </div>
-                  <div className="px-4 py-2 bg-[var(--color-bg-primary)] rounded-xl border border-[var(--color-border-subtle)] font-bold text-sm">
-                    {match.status === 'SCHEDULED' ? 'VS' : `${match.home_score} - ${match.away_score}`}
-                  </div>
-                  <div className="flex-1 text-center font-bold">
-                    <p>{match.away_team?.name}</p>
-                  </div>
-                </div>
-                <div className="text-center mt-3 pt-3 border-t border-[var(--color-border-subtle)]/50">
-                  <span className="text-xs text-[var(--color-accent)] hover:underline font-bold">
-                    تفاصيل المباراة
-                  </span>
-                </div>
-              </Link>
-            ))}
+              .map((match) => {
+                const dateObj = new Date(match.match_date);
+                const timeString = dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' });
+                
+                return (
+                  <MatchCard 
+                    key={match.id}
+                    id={match.id}
+                    homeTeam={translateName(match.home_team?.name || 'فريق')}
+                    awayTeam={translateName(match.away_team?.name || 'فريق')}
+                    homeLogo={match.home_team?.logo_url ?? undefined}
+                    awayLogo={match.away_team?.logo_url ?? undefined}
+                    homeScore={match.home_score}
+                    awayScore={match.away_score}
+                    time={timeString}
+                    status={match.status as any}
+                    league={translateName(match.league?.name || 'كأس العالم')}
+                  />
+                );
+              })}
           </div>
         )}
       </section>
