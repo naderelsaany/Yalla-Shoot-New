@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { data: news } = await supabase
     .from("news")
     .select("title, content, image_url, published_at")
-    .eq("slug", slug)
+    .eq("slug", decodeURIComponent(slug))
     .single();
 
   if (!news) return { title: "خبر غير موجود | يلا شوت نيو" };
@@ -80,7 +80,7 @@ export default async function NewsDetailsPage({ params }: { params: Promise<{ sl
   const { data: news } = await supabase
     .from("news")
     .select("*")
-    .eq("slug", slug)
+    .eq("slug", decodeURIComponent(slug))
     .single();
 
   if (!news) {
