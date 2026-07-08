@@ -5,8 +5,13 @@ import Parser from 'rss-parser';
 // You can use any reliable public Arabic sports RSS feed
 const RSS_FEED_URL = 'https://www.skynewsarabia.com/rss/sport.xml';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const parser = new Parser();
     const feed = await parser.parseURL(RSS_FEED_URL);
     const supabase = getServiceSupabase();

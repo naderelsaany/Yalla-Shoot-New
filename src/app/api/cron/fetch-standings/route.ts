@@ -16,8 +16,13 @@ const COMPETITIONS = [
   { id: 2013, name: 'Campeonato Brasileiro Série A' },
 ];
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     if (!API_KEY) {
       return NextResponse.json({ error: 'API Key not configured' }, { status: 500 });
     }

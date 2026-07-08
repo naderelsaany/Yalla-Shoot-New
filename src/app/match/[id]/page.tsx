@@ -73,7 +73,7 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
     eventStatus: match.status === "IN_PLAY" 
       ? "https://schema.org/EventInProgress" 
       : match.status === "FINISHED" 
-        ? "https://schema.org/EventScheduled" 
+        ? "https://schema.org/EventCompleted" 
         : "https://schema.org/EventScheduled",
   };
 
@@ -106,7 +106,7 @@ function BreadcrumbStructuredData({ leagueName, matchTitle }: { leagueName: stri
         "@type": "ListItem",
         position: 3,
         name: leagueName,
-        item: `https://yallashootnew.com/matches`,
+        item: `https://yallashootnew.com/leagues`,
       },
       {
         "@type": "ListItem",
@@ -158,10 +158,11 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
 
   if (match.home_team?.name) {
     try {
-      const { data } = await supabase
-        .from("players")
-        .select("id, name")
-        .or(`club.eq."${match.home_team.name}",national_team.eq."${match.home_team.name}"`);
+        const safeHomeName = match.home_team.name.replace(/"/g, '""');
+        const { data } = await supabase
+          .from("players")
+          .select("id, name")
+          .or(`club.eq."${safeHomeName}",national_team.eq."${safeHomeName}"`);
       homePlayers = data || [];
       if (homePlayers.length === 0) {
         const { data: data2 } = await supabase
@@ -175,10 +176,11 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
 
   if (match.away_team?.name) {
     try {
-      const { data } = await supabase
-        .from("players")
-        .select("id, name")
-        .or(`club.eq."${match.away_team.name}",national_team.eq."${match.away_team.name}"`);
+        const safeAwayName = match.away_team.name.replace(/"/g, '""');
+        const { data } = await supabase
+          .from("players")
+          .select("id, name")
+          .or(`club.eq."${safeAwayName}",national_team.eq."${safeAwayName}"`);
       awayPlayers = data || [];
       if (awayPlayers.length === 0) {
         const { data: data2 } = await supabase

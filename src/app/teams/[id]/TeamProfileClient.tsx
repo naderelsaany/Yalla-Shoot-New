@@ -70,11 +70,12 @@ export default function TeamProfileClient({ params }: Props) {
         const fetches: PromiseLike<void>[] = [];
 
         // Fetch players
+        const safeTeamName = currentTeam.name.replace(/"/g, '""');
         fetches.push(
           supabase
             .from("players")
             .select("*")
-            .or(`club.eq."${currentTeam.name}",national_team.eq."${currentTeam.name}"`)
+            .or(`club.eq."${safeTeamName}",national_team.eq."${safeTeamName}"`)
             .then(async ({ data: playersData }) => {
               let fetchedPlayers = (playersData || []) as Player[];
               if (fetchedPlayers.length === 0) {

@@ -171,7 +171,7 @@ function WorldCupHubContent() {
                         </Link>
                       </td>
                       <td className="py-4 text-center">{row.played}</td>
-                      <td className="py-4 text-center font-bold text-[var(--accent)]">{row.points}</td>
+                      <td className="py-4 text-center font-bold text-[var(--color-accent)]">{row.points}</td>
                     </tr>
                   ))}
                 </tbody>
