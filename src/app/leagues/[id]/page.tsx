@@ -160,7 +160,7 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
           <section>
             <h2 className="text-2xl font-bold font-tajawal mb-6">المباريات القادمة / الجارية</h2>
             {upcomingMatches.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-4">
                 {upcomingMatches.map((match: MatchWithTeams) => {
                   const dateObj = new Date(match.match_date);
                   const timeString = dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' });
@@ -193,7 +193,7 @@ export default async function LeagueDetailsPage({ params }: { params: Promise<{ 
           <section>
             <h2 className="text-2xl font-bold font-tajawal mb-6">أحدث النتائج (مباريات سابقة)</h2>
             {pastMatches.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-80 hover:opacity-100 transition-opacity">
+              <div className="flex flex-col gap-4 opacity-80 hover:opacity-100 transition-opacity">
                 {pastMatches.map((match: MatchWithTeams) => {
                   const dateObj = new Date(match.match_date);
                   const dateString = dateObj.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Africa/Cairo' });

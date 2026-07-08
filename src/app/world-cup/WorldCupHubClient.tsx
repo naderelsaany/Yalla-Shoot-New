@@ -215,8 +215,28 @@ function WorldCupHubContent() {
         {matches.length === 0 ? (
           <p className="text-center py-10 text-[var(--color-text-secondary)]">لا توجد مباريات جارية حالياً</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {matches.map((match) => (
+          <div className="flex flex-col gap-4">
+            {[...matches]
+              .sort((a, b) => {
+                // Sorting logic: FINISHED matches first, then IN_PLAY/TIMED, then SCHEDULED
+                const getStatusWeight = (status: string) => {
+                  if (status === 'FINISHED' || status === 'AWARDED') return 0;
+                  if (status === 'IN_PLAY' || status === 'PAUSED') return 1;
+                  return 2; // SCHEDULED, POSTPONED, etc.
+                };
+                const weightA = getStatusWeight(a.status);
+                const weightB = getStatusWeight(b.status);
+                
+                if (weightA !== weightB) return weightA - weightB;
+                
+                // If same status, sort by date (newest first for finished, oldest first for scheduled)
+                const dateA = new Date(a.match_date).getTime();
+                const dateB = new Date(b.match_date).getTime();
+                
+                if (weightA === 0) return dateB - dateA; // Finished: newest first
+                return dateA - dateB; // Upcoming: closest first
+              })
+              .map((match) => (
               <Link
                 key={match.id}
                 href={`/match/${match.id}`}

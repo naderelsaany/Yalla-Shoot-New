@@ -83,7 +83,27 @@ export default async function Home() {
     .order('match_date', { ascending: true })
     .limit(15);
 
-  const matches = matchesData as unknown as MatchWithTeams[] | null;
+  let matches = matchesData as unknown as MatchWithTeams[] | null;
+
+  // Fallback: If no upcoming/recent matches exist in the DB, fetch the latest past matches so the homepage is never empty.
+  if (!matches || matches.length === 0) {
+    const { data: fallbackData } = await supabase
+      .from('matches')
+      .select(`
+        id,
+        match_date,
+        status,
+        home_score,
+        away_score,
+        home_team:teams!matches_home_team_id_fkey(name, logo_url),
+        away_team:teams!matches_away_team_id_fkey(name, logo_url),
+        league:leagues(name)
+      `)
+      .order('match_date', { ascending: false })
+      .limit(15);
+      
+    matches = fallbackData as unknown as MatchWithTeams[] | null;
+  }
 
   return (
     <div className="flex-1 flex flex-col">
