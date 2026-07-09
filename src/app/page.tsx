@@ -8,8 +8,9 @@ import { Metadata } from 'next';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "يلا شوت نيو | بث مباشر لمباريات اليوم وكأس العالم",
-  description: "تابع مباريات اليوم بث مباشر بدون تقطيع على يلا شوت نيو. تغطية حصرية لكأس العالم، دوري أبطال أوروبا، والدوريات الكبرى.",
+  title: "بث مباشر لمباريات اليوم وكأس العالم 2026",
+  description: "تابع مباريات اليوم بث مباشر بدون تقطيع على يلا شوت نيو. نتائج المباريات لحظة بلحظة، أهداف اليوم، تغطية حصرية لكأس العالم 2026، دوري أبطال أوروبا، الدوري الإنجليزي، الدوري المصري والدوري السعودي.",
+  keywords: "مباريات اليوم, بث مباشر, نتائج مباريات اليوم, يلا شوت نيو, كأس العالم 2026, اهداف اليوم, الدوري الانجليزي, الاهلي, الزمالك",
   alternates: {
     canonical: "/",
   },
@@ -71,6 +72,7 @@ export default async function Home() {
     .from('matches')
     .select(`
       id,
+      slug,
       match_date,
       status,
       home_score,
@@ -91,6 +93,7 @@ export default async function Home() {
       .from('matches')
       .select(`
         id,
+        slug,
         match_date,
         status,
         home_score,

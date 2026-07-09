@@ -72,11 +72,11 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
                     m.id === newMatch.id 
                       ? { 
                           ...m, 
-                          status: newMatch.status, 
-                          home_score: newMatch.home_score, 
-                          away_score: newMatch.away_score,
-                          match_date: newMatch.match_date,
-                          slug: newMatch.slug
+                          status: newMatch.status ?? m.status, 
+                          home_score: newMatch.home_score ?? m.home_score, 
+                          away_score: newMatch.away_score ?? m.away_score,
+                          match_date: newMatch.match_date ?? m.match_date,
+                          slug: newMatch.slug !== undefined ? newMatch.slug : m.slug
                         } 
                       : m
                   );

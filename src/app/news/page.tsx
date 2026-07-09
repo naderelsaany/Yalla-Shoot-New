@@ -10,8 +10,9 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const canonicalUrl = page && page !== '1' ? `${baseUrl}/news?page=${page}` : `${baseUrl}/news`;
 
   return {
-    title: 'أخبار الرياضة | يلا شوت نيو',
-    description: 'أحدث الأخبار الرياضية وتغطية حصرية للبطولات والمباريات.',
+    title: 'أحدث الأخبار الرياضية',
+    description: 'أحدث الأخبار الرياضية وتغطية حصرية لانتقالات اللاعبين، نتائج المباريات، دوري أبطال أوروبا، الدوري الإنجليزي، الدوري المصري والسعودي على يلا شوت نيو.',
+    keywords: 'أخبار الرياضة, أخبار كرة القدم, انتقالات اللاعبين, أخبار الدوري الانجليزي, أخبار الأهلي, أخبار الزمالك, يلا شوت نيو',
     alternates: {
       canonical: canonicalUrl,
     },

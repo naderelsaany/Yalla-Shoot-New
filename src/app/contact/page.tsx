@@ -2,8 +2,9 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: "اتصل بنا | يلا شوت نيو",
+  title: "اتصل بنا",
   description: "تواصل مع فريق يلا شوت نيو لأي استفسارات أو اقتراحات.",
+  keywords: "اتصل بنا, يلا شوت نيو, تواصل",
   alternates: {
     canonical: '/contact',
   },

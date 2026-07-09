@@ -3,8 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'من نحن | يلا شوت نيو',
-  description: 'تعرف على منصة يلا شوت نيو، الموقع الرياضي الأول لتغطية الأخبار والمباريات.',
+  title: 'من نحن',
+  description: 'تعرف على منصة يلا شوت نيو، الموقع الرياضي العربي الأول لتغطية الأخبار والمباريات بث مباشر.',
+  keywords: 'من نحن, يلا شوت نيو, موقع رياضي, بث مباشر, مباريات اليوم',
   alternates: { canonical: '/about' }
 };
 

@@ -37,13 +37,17 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   title: {
     default: "يلا شوت نيو | Yalla Shoot New - بث مباشر لمباريات اليوم",
-    template: "%s",
+    template: "%s | يلا شوت نيو",
   },
-  description: "تابع مباريات اليوم بث مباشر بدون تقطيع، أهداف المباريات، ترتيب الدوري، وأحدث الأخبار الرياضية على يلا شوت نيو. تغطية حصرية لبطولة كأس العالم، دوري أبطال أوروبا، والدوريات الكبرى.",
-  keywords: ["يلا شوت", "يلا شوت نيو", "بث مباشر", "مباريات اليوم", "كأس العالم", "اهداف اليوم", "yalla shoot", "دوري ابطال اوروبا", "كورة لايف", "ريال مدريد", "برشلونة"],
+  description: "يلا شوت نيو - تابع مباريات اليوم بث مباشر بدون تقطيع، نتائج المباريات لحظة بلحظة، أهداف اليوم، ترتيب الدوريات، وأحدث الأخبار الرياضية. تغطية حصرية لكأس العالم 2026، دوري أبطال أوروبا، الدوري الإنجليزي، الدوري المصري، والدوري السعودي.",
+  keywords: ["يلا شوت", "يلا شوت نيو", "يلا شوت الجديد", "بث مباشر", "مباريات اليوم", "مباريات اليوم بث مباشر", "نتائج مباريات اليوم", "كأس العالم", "كأس العالم 2026", "اهداف اليوم", "yalla shoot", "yalla shoot new", "koora live", "كورة لايف", "دوري ابطال اوروبا", "الدوري الانجليزي", "الدوري المصري", "الدوري السعودي", "ريال مدريد", "برشلونة", "الاهلي", "الزمالك", "الاهلي اليوم", "الزمالك اليوم", "ليفربول", "مانشستر سيتي"],
+  category: "sports",
   authors: [{ name: "يلا شوت نيو" }],
   creator: "يلا شوت نيو",
   publisher: "يلا شوت نيو",
+  other: {
+    'application-name': 'يلا شوت نيو',
+  },
   robots: {
     index: true,
     follow: true,
@@ -115,14 +119,6 @@ function StructuredData() {
         alternateName: "Yalla Shoot New",
         publisher: {
           "@id": `${baseUrl}/#organization`,
-        },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: {
-            "@type": "EntryPoint",
-            urlTemplate: `${baseUrl}/matches?q={search_term_string}`,
-          },
-          "query-input": "required name=search_term_string",
         },
         inLanguage: "ar",
       },

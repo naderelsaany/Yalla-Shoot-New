@@ -51,9 +51,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const league = translateName(matchData.league?.name || "");
 
   return {
-    title: `مباراة ${home} ضد ${away} | ${league}`,
+    title: `مباراة ${home} ضد ${away} — ${league}`,
     description: `تغطية وتفاصيل ونتيجة مباراة ${home} ضد ${away} في بطولة ${league}. بث مباشر وأحداث اللحظة بلحظة.`,
-    keywords: `${home} ضد ${away}, نتيجة مباراة ${home} و ${away}, ${league}, بث مباشر, يلا شوت نيو`,
+    keywords: `${home} ضد ${away}, نتيجة مباراة ${home} و ${away}, ${league}, بث مباشر, يلا شوت نيو, مباريات اليوم`,
     alternates: {
       canonical: `/match/${slug}`,
     },
@@ -284,7 +284,7 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ s
                   <span className="text-[var(--color-text-muted)]">-</span>
                   <span>{match.away_score}</span>
                 </div>
-                {match.status === "IN_PLAY" && (
+                {(match.status === "IN_PLAY" || match.status === "LIVE") && (
                   <span className="flex items-center gap-1.5 text-sm font-bold text-[var(--color-live)] animate-pulse mt-2 bg-[var(--color-live)]/10 px-3 py-1 rounded-full border border-[var(--color-live)]/20">
                     <span className="w-2 h-2 rounded-full bg-[var(--color-live)]"></span>
                     مباشر الآن

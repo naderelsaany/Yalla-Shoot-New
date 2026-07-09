@@ -25,8 +25,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
 
   return {
-    title: `${news.title} | يلا شوت نيو`,
+    title: news.title,
     description: news.content?.substring(0, 160) || "أخبار رياضية حصرية",
+    keywords: `${news.title}, أخبار رياضية, يلا شوت نيو, كرة قدم`,
     alternates: {
       canonical: `${baseUrl}/news/${slug}`,
     },

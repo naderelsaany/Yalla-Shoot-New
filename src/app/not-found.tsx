@@ -1,26 +1,40 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'الصفحة غير موجودة (404)',
+  description: 'عذراً، الصفحة التي تبحث عنها غير موجودة. يمكنك العودة للصفحة الرئيسية لتصفح مباريات اليوم وأحدث الأخبار الرياضية.',
+};
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] font-tajawal px-4">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[var(--color-accent)] opacity-10 blur-[150px] pointer-events-none"></div>
-      
-      <div className="relative z-10 text-center flex flex-col items-center">
-        <h1 className="text-[150px] md:text-[200px] leading-none font-bold text-[var(--color-accent)] opacity-20 select-none">
+    <div className="flex-1 flex flex-col items-center justify-center px-4 py-24 text-center">
+      <div className="mb-8">
+        <span className="text-8xl md:text-9xl font-bold font-tajawal text-[var(--color-accent)] opacity-30 select-none">
           404
-        </h1>
-        <div className="-mt-16 md:-mt-24 mb-6">
-          <h2 className="text-3xl md:text-5xl font-bold mb-4 font-arabic">عذراً، الصفحة غير موجودة</h2>
-          <p className="text-lg text-[var(--color-text-secondary)] max-w-md mx-auto">
-            يبدو أنك وصلت إلى صفحة غير متوفرة أو تم نقلها. لا تقلق، يمكنك العودة ومتابعة المباريات والأخبار.
-          </p>
-        </div>
-        
-        <Link 
-          href="/" 
-          className="bg-[var(--color-accent)] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 hover:scale-105 transition-all shadow-[0_0_20px_rgba(var(--color-accent-rgb),0.3)]"
+        </span>
+      </div>
+
+      <h1 className="text-2xl md:text-4xl font-bold font-tajawal text-[var(--color-text-primary)] mb-4">
+        الصفحة غير موجودة
+      </h1>
+
+      <p className="text-[var(--color-text-secondary)] text-lg max-w-md mb-8 font-tajawal">
+        عذراً، الصفحة التي تبحث عنها قد تكون حُذفت أو نُقلت. يمكنك تصفح المباريات أو الأخبار من الروابط أدناه.
+      </p>
+
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <Link
+          href="/"
+          className="bg-[var(--color-accent)] text-white font-bold font-tajawal px-8 py-3 rounded-xl hover:opacity-90 transition-opacity shadow-lg"
         >
-          العودة إلى الرئيسية
+          العودة للرئيسية
+        </Link>
+        <Link
+          href="/news"
+          className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] font-bold font-tajawal px-8 py-3 rounded-xl hover:bg-[var(--color-bg-card)] transition-colors"
+        >
+          تصفح الأخبار
         </Link>
       </div>
     </div>
