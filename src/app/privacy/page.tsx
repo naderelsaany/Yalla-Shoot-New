@@ -7,9 +7,27 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://yallashootnew.com/privacy' }
 };
 
+function PrivacyStructuredData() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "سياسة الخصوصية | يلا شوت نيو",
+          "description": "اقرأ سياسة الخصوصية الخاصة بمنصة يلا شوت نيو...",
+          "url": "https://yallashootnew.com/privacy"
+        })
+      }}
+    />
+  );
+}
+
 export default function PrivacyPage() {
   return (
-    <div className="container mx-auto px-4 py-12 flex-1 max-w-4xl">
+    <div className="container mx-auto px-4 py-12 flex-1 max-w-4xl text-[var(--color-text-primary)] font-tajawal">
+      <PrivacyStructuredData />
       <nav aria-label="breadcrumb" className="text-sm font-tajawal text-[var(--color-text-muted)] mb-8 flex items-center gap-2">
         <Link href="/" className="hover:text-[var(--color-accent)] transition-colors">الرئيسية</Link>
         <span>/</span>

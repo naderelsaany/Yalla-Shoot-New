@@ -9,9 +9,27 @@ export const metadata: Metadata = {
   },
 };
 
+function ContactStructuredData() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          "name": "اتصل بنا | يلا شوت نيو",
+          "description": "تواصل مع فريق يلا شوت نيو...",
+          "url": "https://yallashootnew.com/contact"
+        })
+      }}
+    />
+  );
+}
+
 export default function ContactPage() {
   return (
     <div className="container mx-auto px-4 py-12 flex-1 max-w-4xl text-[var(--color-text-primary)] font-tajawal">
+      <ContactStructuredData />
       <nav aria-label="breadcrumb" className="text-sm font-tajawal text-[var(--color-text-muted)] mb-8 flex items-center gap-2">
         <Link href="/" className="hover:text-[var(--color-accent)] transition-colors">الرئيسية</Link>
         <span>/</span>

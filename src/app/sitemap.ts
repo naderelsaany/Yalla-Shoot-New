@@ -6,16 +6,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yallashootnew.com'; // Replace with actual domain when deployed
 
   // Fetch dynamic routes
-  const { data: leagues } = await supabase.from('leagues').select('id, updated_at');
   const { data: matches } = await supabase.from('matches').select('id, updated_at');
   const { data: news } = await supabase.from('news').select('slug, updated_at');
-
-  const leagueUrls = leagues?.map((l: Pick<League, 'id' | 'updated_at'>) => ({
-    url: `${baseUrl}/leagues/${l.id}`,
-    lastModified: new Date(l.updated_at || new Date()),
-    changeFrequency: 'hourly' as const,
-    priority: 0.8,
-  })) || [];
 
   const matchUrls = matches?.map((m: Pick<Match, 'id' | 'updated_at'>) => ({
     url: `${baseUrl}/match/${m.id}`,
@@ -44,13 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'hourly',
       priority: 0.8,
     },
-    {
-      url: `${baseUrl}/leagues`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    ...leagueUrls,
     ...matchUrls,
     ...newsUrls,
   ];

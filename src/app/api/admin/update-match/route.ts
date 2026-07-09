@@ -1,15 +1,28 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { Match } from '@/types/database';
 
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('admin_token');
+    const tokenCookie = cookieStore.get('admin_token');
+    const token = tokenCookie?.value;
     
     if (!token) {
       return NextResponse.json({ success: false, message: 'غير مصرح' }, { status: 401 });
+    }
+
+    try {
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        return NextResponse.json({ success: false, message: 'خطأ في إعدادات الخادم' }, { status: 500 });
+      }
+      const secret = new TextEncoder().encode(jwtSecret);
+      await jwtVerify(token, secret);
+    } catch {
+      return NextResponse.json({ success: false, message: 'الجلسة انتهت' }, { status: 401 });
     }
 
     const { id, video_url, status, home_score, away_score } = await request.json();

@@ -163,6 +163,11 @@ export default async function RootLayout({
         {process.env.PLAYWRIGHT_TEST === 'true' && (
           <script dangerouslySetInnerHTML={{ __html: 'window.PLAYWRIGHT_TEST = true;' }} />
         )}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
+          <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />
+        )}
         <StructuredData />
       </head>
       <body className="antialiased selection:bg-[var(--color-accent)] selection:text-white min-h-screen flex flex-col bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">

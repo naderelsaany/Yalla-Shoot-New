@@ -16,7 +16,9 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
         'postgres_changes',
         { event: '*', schema: 'public', table: 'matches' },
         (payload) => {
-          console.log('Realtime update received!', payload);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Realtime update received!', payload);
+          }
           
           if (payload.eventType === 'DELETE') {
             const oldId = payload.old.id;
@@ -110,6 +112,7 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
       {matches.map((match) => {
         const dateObj = new Date(match.match_date);
         const timeString = dateObj.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' });
+        const dateString = dateObj.toLocaleDateString('ar-EG', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'Africa/Cairo' });
         
         return (
           <MatchCard 
@@ -122,6 +125,7 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
             homeScore={match.home_score}
             awayScore={match.away_score}
             time={timeString}
+            date={dateString}
             status={match.status as MatchCardProps['status']}
             league={translateName(match.league?.name || 'بطولة')}
           />

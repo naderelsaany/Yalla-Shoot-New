@@ -95,7 +95,7 @@ export default function LiveScoreBanner() {
       data-testid="live-banner"
       className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--color-bg-elevated)] border-t border-[var(--color-border-subtle)] py-3 px-4 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] flex items-center justify-between gap-4"
     >
-      <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1">
+      <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap no-scrollbar flex-1">
         <span className="flex items-center gap-1 bg-[var(--color-live)]/10 text-[var(--color-live)] text-xs font-bold px-2 py-1 rounded-full animate-pulse">
           <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-live)]"></span>
           مباشر

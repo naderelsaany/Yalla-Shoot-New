@@ -32,6 +32,7 @@
 
   /* الخطوط */
   --font-arabic: var(--font-arabic);
+  --font-tajawal: var(--font-tajawal);
 }
 
 @layer base {

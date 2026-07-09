@@ -8,9 +8,31 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://yallashootnew.com/about' }
 };
 
+function AboutStructuredData() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          "name": "من نحن | يلا شوت نيو",
+          "description": "تعرف على منصة يلا شوت نيو...",
+          "url": "https://yallashootnew.com/about",
+          "mainEntity": {
+            "@type": "Organization",
+            "name": "يلا شوت نيو"
+          }
+        })
+      }}
+    />
+  );
+}
+
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-12 flex-1 max-w-4xl">
+      <AboutStructuredData />
       <nav aria-label="breadcrumb" className="text-sm font-tajawal text-[var(--color-text-muted)] mb-8 flex items-center gap-2">
         <Link href="/" className="hover:text-[var(--color-accent)] transition-colors">الرئيسية</Link>
         <span>/</span>

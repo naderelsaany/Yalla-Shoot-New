@@ -10,6 +10,7 @@ export interface MatchCardProps {
   homeScore?: number | null;
   awayScore?: number | null;
   time: string;
+  date?: string;
   status: 'SCHEDULED' | 'TIMED' | 'IN_PLAY' | 'PAUSED' | 'FINISHED' | 'SUSPENDED' | 'POSTPONED' | 'CANCELLED' | 'AWARDED';
   league: string;
 }
@@ -35,6 +36,7 @@ export default function MatchCard({
   homeScore,
   awayScore,
   time,
+  date,
   status,
   league,
 }: MatchCardProps) {
@@ -64,9 +66,12 @@ export default function MatchCard({
           <span className="text-sm font-bold text-center text-[var(--color-text-primary)]">{homeTeam}</span>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-4">
+        <div className="flex-1 flex flex-col items-center justify-center px-2">
           {status === 'SCHEDULED' || status === 'TIMED' || status === 'POSTPONED' || status === 'CANCELLED' ? (
-            <span className="text-lg font-bold text-[var(--color-text-muted)]">VS</span>
+            <div className="flex flex-col items-center gap-1 bg-[var(--color-bg-elevated)] py-2 px-3 rounded-xl border border-[var(--color-border-subtle)]">
+              <span className="text-sm md:text-base font-bold font-tajawal text-[var(--color-text-primary)] whitespace-nowrap">{time}</span>
+              {date && <span className="text-[10px] md:text-xs font-tajawal text-[var(--color-text-muted)] whitespace-nowrap">{date}</span>}
+            </div>
           ) : (
             <div className="flex items-center gap-3 text-2xl font-bold font-tajawal text-[var(--color-text-primary)]">
               <span>{homeScore ?? '-'}</span>
@@ -82,9 +87,9 @@ export default function MatchCard({
         </div>
       </div>
       
-      {/* ✅ إصلاح: عرض الوقت دائماً */}
+      
       <div className="mt-3 text-center">
-        <span className="text-xs text-[var(--color-text-muted)] font-tajawal">{time}</span>
+        <span className="text-xs text-[var(--color-accent)] font-tajawal font-medium group-hover:underline">عرض التفاصيل</span>
       </div>
     </Link>
   );

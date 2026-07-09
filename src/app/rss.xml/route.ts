@@ -26,6 +26,8 @@ export async function GET() {
     <link>${baseUrl}</link>
     <description>آخر الأخبار الرياضية</description>
     <language>ar</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <generator>Next.js</generator>
     ${items}
   </channel>
 </rss>`;

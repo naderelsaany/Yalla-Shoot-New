@@ -8,6 +8,11 @@ import { MatchWithTeams } from "@/types/database";
 
 export const revalidate = 30;
 
+export async function generateStaticParams() {
+  const { data: matches } = await supabase.from('matches').select('id').order('match_date', { ascending: false }).limit(200);
+  return matches?.map(({ id }) => ({ id })) || [];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const { data: matchData } = await supabase
@@ -78,10 +83,28 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
   };
 
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      {match.video_url && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              "name": `${homeName} ضد ${awayName}`,
+              "description": `بث مباشر لمباراة ${homeName} ضد ${awayName}`,
+              "embedUrl": match.video_url,
+              "uploadDate": match.match_date,
+              "thumbnailUrl": "https://yallashootnew.com/icon-192.png"
+            })
+          }}
+        />
+      )}
+    </>
   );
 }
 
@@ -100,7 +123,6 @@ function BreadcrumbStructuredData({ leagueName, matchTitle }: { leagueName: stri
         "@type": "ListItem",
         position: 2,
         name: leagueName,
-        item: `https://yallashootnew.com/leagues`,
       },
       {
         "@type": "ListItem",
@@ -206,14 +228,12 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
       <MatchStructuredData match={match} />
       <BreadcrumbStructuredData leagueName={leagueName} matchTitle={`${homeName} ضد ${awayName}`} />
 
-      {/* Breadcrumbs */}
       <nav aria-label="breadcrumb" className="text-sm font-tajawal text-[var(--color-text-muted)] mb-6 flex items-center gap-2">
         <Link href="/" className="hover:text-[var(--color-accent)]">الرئيسية</Link>
         <span>/</span>
         <span className="text-[var(--color-text-primary)]">{leagueName}</span>
       </nav>
 
-      {/* Match Header */}
       <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-3xl p-6 md:p-10 shadow-[var(--shadow-elevated)] relative overflow-hidden mb-8">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[var(--color-accent)] opacity-5 blur-[100px] pointer-events-none"></div>
 
@@ -270,15 +290,28 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
         <div className="mt-8 mb-8 bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-4 shadow-sm">
           <h2 className="font-bold font-arabic text-lg text-[var(--color-text-primary)] mb-4">البث المباشر</h2>
           <div className="aspect-video w-full bg-black rounded-xl overflow-hidden shadow-inner">
-            {match.video_url.includes('youtube.com') || match.video_url.includes('youtu.be') ? (
-              <iframe
-                src={match.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/')}
-                className="w-full h-full"
-                allowFullScreen
-              />
-            ) : (
-              <video controls className="w-full h-full" src={match.video_url} />
-            )}
+            {(() => {
+              const url = match.video_url as string;
+              const isDirectVideo = /\.(mp4|webm|ogg|m3u8)$/i.test(url.split('?')[0]);
+              
+              if (isDirectVideo) {
+                return <video controls className="w-full h-full" src={url} />;
+              }
+              
+              let iframeUrl = url;
+              if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                iframeUrl = url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/');
+              }
+              
+              return (
+                <iframe
+                  src={iframeUrl}
+                  className="w-full h-full"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              );
+            })()}
           </div>
         </div>
       )}

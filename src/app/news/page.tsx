@@ -7,6 +7,9 @@ import Image from 'next/image';
 export const metadata: Metadata = {
   title: 'أخبار الرياضة | يلا شوت نيو',
   description: 'أحدث الأخبار الرياضية وتغطية حصرية للبطولات والمباريات.',
+  alternates: {
+    canonical: 'https://yallashootnew.com/news',
+  },
 };
 
 export const revalidate = 60; // ISR

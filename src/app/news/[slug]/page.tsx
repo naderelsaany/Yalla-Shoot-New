@@ -7,6 +7,11 @@ import sanitizeHtml from "sanitize-html";
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  const { data: news } = await supabase.from('news').select('slug').order('published_at', { ascending: false }).limit(100);
+  return news?.map(({ slug }) => ({ slug })) || [];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const { data: news } = await supabase
@@ -55,6 +60,8 @@ function NewsArticleStructuredData({ news }: { news: News }) {
       logo: {
         "@type": "ImageObject",
         url: "https://yallashootnew.com/icon-192.png",
+        width: 192,
+        height: 192
       },
     },
     description: news.content?.substring(0, 200),

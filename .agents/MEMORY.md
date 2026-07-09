@@ -63,7 +63,19 @@
 
 ## 📊 سجل التقدم (Changelog)
 
-### 2026-07-09 — حذف الصفحات غير المطلوبة (Teams, Matches, World Cup)
+### [2026-07-09] - تحسينات الأداء والـ SEO (رد DeepSeek)
+- **القرارات:** 
+  - الإبقاء على ملف `proxy.ts` بدلاً من `middleware.ts` لأن إصدار Next.js 16.2.10 (Turbopack) يدعم `proxy.ts` حصرياً بناءً على رسائل الـ Build، واقتراح DeepSeek كان مبنياً على إصدارات أقدم.
+  - تطبيق تقنية SSG عبر `generateStaticParams` للصفحات الديناميكية.
+- **ما تم تنفيذه:**
+  - إضافة `generateStaticParams` لمسارات (`/leagues/[id]`, `/match/[id]`, `/news/[slug]`) لتحسين سرعة التحميل وفهرسة جوجل.
+  - إنشاء ملفات `loading.tsx` لمسارات `match` و `leagues` لتحسين تجربة المستخدم.
+  - إضافة `alternates.canonical` لصفحات الأخبار والبطولات لتقوية الـ SEO.
+  - إضافة روابط `preconnect` في `layout.tsx` لتقليل الـ Latency للخطوط وقاعدة البيانات.
+  - تحسين مخرجات `rss.xml` بإضافة `lastBuildDate` و `generator`.
+- **المشاكل الحالية:** لا يوجد (تم تأكيد نجاح الـ Build بنسبة 100%).
+
+### [2026-07-09] - تنظيف المشروع وتحديث الهيكلةوبة (Teams, Matches, World Cup)
 - ✅ حذف مجلدات `src/app/teams`, `src/app/world-cup`, `src/app/matches` بالكامل.
 - ✅ تنظيف الروابط في `Header.tsx` و `match/[id]/page.tsx` و `sitemap.ts`.
 - ✅ تشغيل `npm run build` بنجاح بعد تنظيف الـ Cache (صفر أخطاء).
