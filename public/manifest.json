@@ -4,6 +4,10 @@
   "description": "مباريات اليوم، نتائج المباريات، وأخبار الرياضة لحظة بلحظة",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ar",
+  "dir": "rtl",
   "background_color": "#0a0e17",
   "theme_color": "#0a0e17",
   "icons": [

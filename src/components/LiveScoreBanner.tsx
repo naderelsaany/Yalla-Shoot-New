@@ -17,12 +17,15 @@ interface Match {
 export default function LiveScoreBanner() {
   const [liveMatches, setLiveMatches] = useState<Match[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [isClosed, setIsClosed] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('hide-live-banner') === 'true';
+  const [isClosed, setIsClosed] = useState<boolean>(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    if (localStorage.getItem('hide-live-banner') === 'true') {
+      setIsClosed(true);
     }
-    return false;
-  });
+  }, []);
 
   useEffect(() => {
     if (isClosed) return;
@@ -86,7 +89,7 @@ export default function LiveScoreBanner() {
     setIsClosed(true);
   };
 
-  if (isClosed || !isVisible || liveMatches.length === 0) {
+  if (!isMounted || isClosed || !isVisible || liveMatches.length === 0) {
     return null;
   }
 
