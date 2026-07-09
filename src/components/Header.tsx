@@ -25,11 +25,8 @@ export default function Header() {
         {/* Navigation - Scrollable on Mobile */}
         <nav className="flex items-center gap-4 md:gap-8 font-tajawal text-[var(--color-text-secondary)] font-medium overflow-x-auto md:overflow-visible whitespace-nowrap no-scrollbar pr-4">
           <Link href="/" className="hover:text-[var(--color-accent)] transition-colors">الرئيسية</Link>
-          <Link href="/matches" className="hover:text-[var(--color-accent)] transition-colors">المباريات</Link>
           <Link href="/news" className="hover:text-[var(--color-accent)] transition-colors">الأخبار</Link>
           <Link href="/leagues" className="hover:text-[var(--color-accent)] transition-colors">البطولات</Link>
-          <Link href="/teams" className="hover:text-[var(--color-accent)] transition-colors">الفرق</Link>
-          <Link href="/world-cup" className="hover:text-[var(--color-accent)] transition-colors">كأس العالم</Link>
         </nav>
       </div>
     </header>

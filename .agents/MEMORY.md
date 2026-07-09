@@ -63,6 +63,11 @@
 
 ## 📊 سجل التقدم (Changelog)
 
+### 2026-07-09 — حذف الصفحات غير المطلوبة (Teams, Matches, World Cup)
+- ✅ حذف مجلدات `src/app/teams`, `src/app/world-cup`, `src/app/matches` بالكامل.
+- ✅ تنظيف الروابط في `Header.tsx` و `match/[id]/page.tsx` و `sitemap.ts`.
+- ✅ تشغيل `npm run build` بنجاح بعد تنظيف الـ Cache (صفر أخطاء).
+
 ### 2026-07-09 — تنفيذ مراجعة DeepSeek
 - ✅ إزالة `instrumentation.ts` و `mockFetch` من الكود للإنتاج الحقيقي
 - ✅ تحسين الـ SEO (إصلاح تكرار العنوان، روابط Canonical صحيحة، وتحديث خريطة الموقع)

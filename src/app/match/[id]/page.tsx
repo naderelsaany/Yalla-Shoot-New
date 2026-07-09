@@ -99,18 +99,12 @@ function BreadcrumbStructuredData({ leagueName, matchTitle }: { leagueName: stri
       {
         "@type": "ListItem",
         position: 2,
-        name: "المباريات",
-        item: "https://yallashootnew.com/matches",
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
         name: leagueName,
         item: `https://yallashootnew.com/leagues`,
       },
       {
         "@type": "ListItem",
-        position: 4,
+        position: 3,
         name: matchTitle,
       },
     ],
@@ -216,8 +210,6 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
       <nav aria-label="breadcrumb" className="text-sm font-tajawal text-[var(--color-text-muted)] mb-6 flex items-center gap-2">
         <Link href="/" className="hover:text-[var(--color-accent)]">الرئيسية</Link>
         <span>/</span>
-        <Link href="/matches" className="hover:text-[var(--color-accent)]">المباريات</Link>
-        <span>/</span>
         <span className="text-[var(--color-text-primary)]">{leagueName}</span>
       </nav>
 
@@ -231,14 +223,13 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
         </div>
 
         <div className="flex items-center justify-between">
-          <Link
-            href={`/teams/${match.home_team?.id || 'ahly'}`}
+          <div
             data-testid="team-link-home"
-            className="flex flex-col items-center gap-4 flex-1 hover:text-[var(--color-accent)] transition-colors"
+            className="flex flex-col items-center gap-4 flex-1"
           >
             <TeamLogo src={match.home_team?.logo_url ?? undefined} alt={homeName} size="lg" />
             <span className="text-lg md:text-2xl font-bold text-center text-[var(--color-text-primary)]">{homeName}</span>
-          </Link>
+          </div>
 
           <div className="flex-1 flex flex-col items-center justify-center">
             {match.status === "SCHEDULED" ? (
@@ -265,14 +256,13 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
             )}
           </div>
 
-          <Link
-            href={`/teams/${match.away_team?.id || 'ahly'}`}
+          <div
             data-testid="team-link-away"
-            className="flex flex-col items-center gap-4 flex-1 hover:text-[var(--color-accent)] transition-colors"
+            className="flex flex-col items-center gap-4 flex-1"
           >
             <TeamLogo src={match.away_team?.logo_url ?? undefined} alt={awayName} size="lg" />
             <span className="text-lg md:text-2xl font-bold text-center text-[var(--color-text-primary)]">{awayName}</span>
-          </Link>
+          </div>
         </div>
       </div>
 
