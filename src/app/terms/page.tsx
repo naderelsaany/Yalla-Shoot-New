@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'الشروط والأحكام | يلا شوت نيو',
   description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو.',
-  alternates: { canonical: 'https://yallashootnew.com/terms' }
+  alternates: { canonical: '/terms' }
 };
 
 function TermsStructuredData() {
@@ -17,7 +17,7 @@ function TermsStructuredData() {
           "@type": "WebPage",
           "name": "شروط الاستخدام | يلا شوت نيو",
           "description": "اقرأ شروط الاستخدام لمنصة يلا شوت نيو...",
-          "url": "https://yallashootnew.com/terms"
+          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/terms`
         })
       }}
     />

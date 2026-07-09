@@ -4,13 +4,19 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export const metadata: Metadata = {
-  title: 'أخبار الرياضة | يلا شوت نيو',
-  description: 'أحدث الأخبار الرياضية وتغطية حصرية للبطولات والمباريات.',
-  alternates: {
-    canonical: 'https://yallashootnew.com/news',
-  },
-};
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ page?: string }> }): Promise<Metadata> {
+  const { page } = await searchParams;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yallashootnew.com';
+  const canonicalUrl = page && page !== '1' ? `${baseUrl}/news?page=${page}` : `${baseUrl}/news`;
+
+  return {
+    title: 'أخبار الرياضة | يلا شوت نيو',
+    description: 'أحدث الأخبار الرياضية وتغطية حصرية للبطولات والمباريات.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 export const revalidate = 60; // ISR
 
@@ -91,7 +97,6 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
                       fill
                       className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      unoptimized={news.image_url.startsWith('http')}
                     />
                   </div>
                 ) : (

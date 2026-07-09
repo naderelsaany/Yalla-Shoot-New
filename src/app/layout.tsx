@@ -59,20 +59,11 @@ export const metadata: Metadata = {
     siteName: "يلا شوت نيو",
     title: "يلا شوت نيو | Yalla Shoot New",
     description: "تابع مباريات اليوم بث مباشر وتغطية حصرية لبطولة كأس العالم.",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "يلا شوت نيو - بث مباشر لمباريات اليوم",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "يلا شوت نيو | مباريات اليوم وكأس العالم",
     description: "بث مباشر لمباريات اليوم وأحدث الأخبار وتغطية كأس العالم.",
-    images: ["/twitter-image.jpg"],
     creator: "@yallashootnew",
   },
   verification: {

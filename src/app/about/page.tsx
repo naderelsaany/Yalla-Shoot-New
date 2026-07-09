@@ -5,7 +5,7 @@ import Image from 'next/image';
 export const metadata: Metadata = {
   title: 'من نحن | يلا شوت نيو',
   description: 'تعرف على منصة يلا شوت نيو، الموقع الرياضي الأول لتغطية الأخبار والمباريات.',
-  alternates: { canonical: 'https://yallashootnew.com/about' }
+  alternates: { canonical: '/about' }
 };
 
 function AboutStructuredData() {
@@ -18,7 +18,7 @@ function AboutStructuredData() {
           "@type": "AboutPage",
           "name": "من نحن | يلا شوت نيو",
           "description": "تعرف على منصة يلا شوت نيو...",
-          "url": "https://yallashootnew.com/about",
+          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/about`,
           "mainEntity": {
             "@type": "Organization",
             "name": "يلا شوت نيو"

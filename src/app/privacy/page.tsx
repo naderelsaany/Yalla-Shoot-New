@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'سياسة الخصوصية | يلا شوت نيو',
   description: 'سياسة الخصوصية لموقع يلا شوت نيو وتفاصيل جمع البيانات والإعلانات.',
-  alternates: { canonical: 'https://yallashootnew.com/privacy' }
+  alternates: { canonical: '/privacy' }
 };
 
 function PrivacyStructuredData() {
@@ -17,7 +17,7 @@ function PrivacyStructuredData() {
           "@type": "WebPage",
           "name": "سياسة الخصوصية | يلا شوت نيو",
           "description": "اقرأ سياسة الخصوصية الخاصة بمنصة يلا شوت نيو...",
-          "url": "https://yallashootnew.com/privacy"
+          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/privacy`
         })
       }}
     />

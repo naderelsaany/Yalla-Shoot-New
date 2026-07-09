@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: "يلا شوت نيو | بث مباشر لمباريات اليوم وكأس العالم",
   description: "تابع مباريات اليوم بث مباشر بدون تقطيع على يلا شوت نيو. تغطية حصرية لكأس العالم، دوري أبطال أوروبا، والدوريات الكبرى.",
   alternates: {
-    canonical: "https://yallashootnew.com",
+    canonical: "/",
   },
   openGraph: {
     title: "يلا شوت نيو | بث مباشر لمباريات اليوم",
     description: "أسرع تغطية لنتائج المباريات وأهم الأخبار الرياضية.",
-    url: "https://yallashootnew.com",
+    url: "/",
     type: "website",
   },
 };
@@ -48,7 +48,7 @@ function HomeStructuredData({ matches }: { matches: MatchWithTeams[] }) {
           "@type": "Place",
           name: translateName(match.league?.name || ""),
         },
-        url: `https://yallashootnew.com/match/${match.id}`,
+        url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/match/${match.id}`,
       },
     })),
   };

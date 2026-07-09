@@ -37,12 +37,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title: `مباراة ${home} ضد ${away} | ${league}`,
     description: `تغطية وتفاصيل ونتيجة مباراة ${home} ضد ${away} في بطولة ${league}. بث مباشر وأحداث اللحظة بلحظة.`,
     alternates: {
-      canonical: `https://yallashootnew.com/match/${id}`,
+      canonical: `/match/${id}`,
     },
     openGraph: {
       title: `مباراة ${home} ضد ${away}`,
       description: `تابع مباراة ${home} و${away} في ${league}`,
-      url: `https://yallashootnew.com/match/${id}`,
+      url: `/match/${id}`,
       type: "article",
     },
   };
@@ -60,7 +60,7 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
     startDate: match.match_date,
     sport: "Soccer",
     description: `مباراة ${homeName} ضد ${awayName} في بطولة ${leagueName}`,
-    url: `https://yallashootnew.com/match/${match.id}`,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/match/${match.id}`,
     homeTeam: {
       "@type": "SportsTeam",
       name: homeName,
@@ -117,7 +117,7 @@ function BreadcrumbStructuredData({ leagueName, matchTitle }: { leagueName: stri
         "@type": "ListItem",
         position: 1,
         name: "الرئيسية",
-        item: "https://yallashootnew.com",
+        item: process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com",
       },
       {
         "@type": "ListItem",
@@ -235,10 +235,11 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
       </nav>
 
       <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-3xl p-6 md:p-10 shadow-[var(--shadow-elevated)] relative overflow-hidden mb-8">
+        <h1 className="sr-only">مباراة {homeName} ضد {awayName} في {leagueName}</h1>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[var(--color-accent)] opacity-5 blur-[100px] pointer-events-none"></div>
 
         <div className="text-center mb-8">
-          <h1 className="text-xl md:text-2xl font-bold font-arabic text-[var(--color-text-primary)]">{leagueName}</h1>
+          <h2 className="text-xl md:text-2xl font-bold font-arabic text-[var(--color-text-primary)]">{leagueName}</h2>
           <p className="text-[var(--color-text-secondary)] font-tajawal mt-2">{dateString} • {timeString}</p>
         </div>
 
@@ -327,9 +328,9 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
               ) : (
                 homePlayers.map((p) => (
                   <li key={p.id} className="mb-1">
-                    <Link href={`/players/${p.id}`} data-testid="player-link" className="text-[var(--color-accent)] hover:underline">
+                    <span data-testid="player-name" className="text-[var(--color-text-primary)]">
                       {p.name}
-                    </Link>
+                    </span>
                   </li>
                 ))
               )}
@@ -343,9 +344,9 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
               ) : (
                 awayPlayers.map((p) => (
                   <li key={p.id} className="mb-1">
-                    <Link href={`/players/${p.id}`} data-testid="player-link" className="text-[var(--color-accent)] hover:underline">
+                    <span data-testid="player-name" className="text-[var(--color-text-primary)]">
                       {p.name}
-                    </Link>
+                    </span>
                   </li>
                 ))
               )}

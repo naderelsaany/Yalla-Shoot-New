@@ -1,4 +1,13 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'لوحة التحكم | يلا شوت نيو',
+  description: 'إدارة محتوى الموقع',
+  robots: {
+    index: false,
+  },
+};
 
 export default async function AdminLayout({
   children,

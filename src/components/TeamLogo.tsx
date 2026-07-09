@@ -32,7 +32,6 @@ export default function TeamLogo({ src, alt, size = "md" }: TeamLogoProps) {
           width={pixelSizes[size]}
           height={pixelSizes[size]}
           className="w-[85%] h-[85%] object-contain"
-          unoptimized={src.startsWith("http")}
         />
       ) : (
         <span className="text-[var(--color-text-muted)] text-[0.6rem] font-tajawal">شعار</span>

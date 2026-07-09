@@ -43,10 +43,13 @@ export async function GET(request: Request) {
         // Generate a simple slug from title or fallback to timestamp
         const slug = item.title.replace(/\s+/g, '-').replace(/[^\w\u0600-\u06FF-]/g, '') + '-' + Date.now();
 
+        const originalLink = item.link ? `\n\nالمصدر: ${item.link}` : '';
+        const content = (item.contentSnippet || item.content || '') + originalLink;
+
         const { error } = await supabase.from('news').insert({
           title: item.title,
           slug: slug,
-          content: item.contentSnippet || item.content || '',
+          content: content,
           image_url: imageUrl,
           published_at: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
         });
