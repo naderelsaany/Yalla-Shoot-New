@@ -8,13 +8,42 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const { page } = await searchParams;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
   const canonicalUrl = page && page !== '1' ? `${baseUrl}/news?page=${page}` : `${baseUrl}/news`;
+  
+  const pageTitle = page && page !== '1' ? `أخبار الرياضة - صفحة ${page}` : 'أحدث الأخبار الرياضية';
+  const pageDesc = 'أحدث الأخبار الرياضية وتغطية حصرية لانتقالات اللاعبين، نتائج المباريات، دوري أبطال أوروبا، الدوري الإنجليزي، الدوري المصري والسعودي على يلا شوت نيو.';
+  
+  const prevUrl = page && parseInt(page) > 1
+    ? (parseInt(page) - 1 === 1 ? `${baseUrl}/news` : `${baseUrl}/news?page=${parseInt(page) - 1}`)
+    : undefined;
+  const nextUrl = page ? `${baseUrl}/news?page=${parseInt(page) + 1}` : undefined;
 
   return {
-    title: 'أحدث الأخبار الرياضية',
-    description: 'أحدث الأخبار الرياضية وتغطية حصرية لانتقالات اللاعبين، نتائج المباريات، دوري أبطال أوروبا، الدوري الإنجليزي، الدوري المصري والسعودي على يلا شوت نيو.',
-    keywords: 'أخبار الرياضة, أخبار كرة القدم, انتقالات اللاعبين, أخبار الدوري الانجليزي, أخبار الأهلي, أخبار الزمالك, يلا شوت نيو',
+    title: pageTitle,
+    description: pageDesc,
+    keywords: 'أخبار الرياضة, أخبار كرة القدم, انتقالات اللاعبين, أخبار الدوري الانجليزي, أخبار الأهلي, أخبار الزمالك, أخبار الاتحاد, أخبار الهلال, أخبار النصر, يلا شوت نيو',
     alternates: {
       canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${pageTitle} | يلا شوت نيو`,
+      description: pageDesc,
+      url: canonicalUrl,
+      type: 'website',
+      images: [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: pageTitle,
+      description: pageDesc,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true },
+    },
+    other: {
+      ...(prevUrl ? { 'prev': prevUrl } : {}),
+      ...(nextUrl ? { 'next': nextUrl } : {}),
     },
   };
 }

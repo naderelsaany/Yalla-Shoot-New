@@ -1,26 +1,55 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+
 export const metadata: Metadata = {
   title: 'الشروط والأحكام',
-  description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو.',
-  keywords: 'الشروط والأحكام, يلا شوت نيو',
-  alternates: { canonical: '/terms' }
+  description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو. تعرف على حقوقك وواجباتك عند استخدام منصتنا الرياضية للمباريات والأخبار.',
+  keywords: 'الشروط والأحكام, شروط الاستخدام, يلا شوت نيو, سياسة الموقع, حقوق الملكية الفكرية, Yalla Shoot New terms',
+  alternates: { canonical: '/terms' },
+  openGraph: {
+    title: 'الشروط والأحكام - يلا شوت نيو',
+    description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو. تعرف على حقوقك وواجباتك.',
+    url: `${baseUrl}/terms`,
+    type: 'website',
+    images: [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'الشروط والأحكام - يلا شوت نيو',
+    description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو.',
+  },
 };
 
 function TermsStructuredData() {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}/terms`,
+        'name': 'شروط الاستخدام | يلا شوت نيو',
+        'description': 'اقرأ شروط الاستخدام لمنصة يلا شوت نيو...',
+        'url': `${baseUrl}/terms`,
+        'inLanguage': 'ar',
+        'about': { '@type': 'Organization', 'name': 'يلا شوت نيو' },
+        'isPartOf': { '@type': 'WebSite', '@id': `${baseUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'الشروط والأحكام', item: `${baseUrl}/terms` },
+        ],
+      },
+    ],
+  };
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          "name": "شروط الاستخدام | يلا شوت نيو",
-          "description": "اقرأ شروط الاستخدام لمنصة يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/terms`
-        })
-      }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
     />
   );
 }

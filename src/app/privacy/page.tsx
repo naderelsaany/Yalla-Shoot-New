@@ -1,26 +1,55 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+
 export const metadata: Metadata = {
   title: 'سياسة الخصوصية',
-  description: 'سياسة الخصوصية لموقع يلا شوت نيو وتفاصيل جمع البيانات والإعلانات.',
-  keywords: 'سياسة الخصوصية, يلا شوت نيو',
-  alternates: { canonical: '/privacy' }
+  description: 'سياسة الخصوصية لموقع يلا شوت نيو. تعرف على كيفية جمع واستخدام وحماية بياناتك الشخصية عند استخدام منصتنا الرياضية.',
+  keywords: 'سياسة الخصوصية, سياسة يلا شوت نيو, الخصوصية, حماية البيانات, ملفات تعريف الارتباط, سياسة cookies, Yalla Shoot New privacy',
+  alternates: { canonical: '/privacy' },
+  openGraph: {
+    title: 'سياسة الخصوصية - يلا شوت نيو',
+    description: 'تعرف على سياسة الخصوصية لموقع يلا شوت نيو وكيف نحمي بياناتك.',
+    url: `${baseUrl}/privacy`,
+    type: 'website',
+    images: [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'سياسة الخصوصية - يلا شوت نيو',
+    description: 'سياسة الخصوصية لموقع يلا شوت نيو - تعرف على كيفية حماية بياناتك.',
+  },
 };
 
 function PrivacyStructuredData() {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}/privacy`,
+        'name': 'سياسة الخصوصية | يلا شوت نيو',
+        'description': 'سياسة الخصوصية لموقع يلا شوت نيو...',
+        'url': `${baseUrl}/privacy`,
+        'inLanguage': 'ar',
+        'about': { '@type': 'Organization', 'name': 'يلا شوت نيو' },
+        'isPartOf': { '@type': 'WebSite', '@id': `${baseUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'سياسة الخصوصية', item: `${baseUrl}/privacy` },
+        ],
+      },
+    ],
+  };
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          "name": "سياسة الخصوصية | يلا شوت نيو",
-          "description": "اقرأ سياسة الخصوصية الخاصة بمنصة يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/privacy`
-        })
-      }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
     />
   );
 }

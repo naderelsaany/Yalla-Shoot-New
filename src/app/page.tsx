@@ -10,48 +10,70 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "بث مباشر لمباريات اليوم وكأس العالم 2026",
   description: "تابع مباريات اليوم بث مباشر بدون تقطيع على يلا شوت نيو. نتائج المباريات لحظة بلحظة، أهداف اليوم، تغطية حصرية لكأس العالم 2026، دوري أبطال أوروبا، الدوري الإنجليزي، الدوري المصري والدوري السعودي.",
-  keywords: "مباريات اليوم, بث مباشر, نتائج مباريات اليوم, يلا شوت نيو, كأس العالم 2026, اهداف اليوم, الدوري الانجليزي, الاهلي, الزمالك",
+  keywords: "مباريات اليوم, بث مباشر, نتائج مباريات اليوم, يلا شوت نيو, كأس العالم 2026, اهداف اليوم, الدوري الانجليزي, الدوري المصري, الدوري السعودي, دوري ابطال اوروبا, yalla shoot, الاهلي, الزمالك, الهلال, النصر, الاتحاد, مباريات اليوم بث مباشر, كورة لايف, koora live",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "يلا شوت نيو | بث مباشر لمباريات اليوم",
-    description: "أسرع تغطية لنتائج المباريات وأهم الأخبار الرياضية.",
+    description: "أسرع تغطية لنتائج المباريات وأهم الأخبار الرياضية. تابع مباريات اليوم بث مباشر ونتائج لحظية.",
     url: "/",
     type: "website",
+    images: [{ url: "/icon-192.png", width: 192, height: 192, alt: "يلا شوت نيو" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "يلا شوت نيو | بث مباشر لمباريات اليوم",
+    description: "أسرع تغطية لنتائج المباريات وأهم الأخبار الرياضية.",
+    creator: "@yallashootnew",
   },
 };
 
-// JSON-LD للصفحة الرئيسية - SportsEvent list
+// JSON-LD للصفحة الرئيسية - SportsEvent list with scores
 function HomeStructuredData({ matches }: { matches: MatchWithTeams[] }) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: matches.map((match, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "SportsEvent",
-        name: `${translateName(match.home_team?.name || "")} ضد ${translateName(match.away_team?.name || "")}`,
-        startDate: match.match_date,
-        sport: "Soccer",
-        homeTeam: {
-          "@type": "SportsTeam",
-          name: translateName(match.home_team?.name || ""),
-          image: match.home_team?.logo_url,
+    itemListElement: matches.map((match, index) => {
+      const isFinished = match.status === "FINISHED";
+      const isLive = match.status === "IN_PLAY" || match.status === "LIVE";
+      const homeName = translateName(match.home_team?.name || "");
+      const awayName = translateName(match.away_team?.name || "");
+      
+      return {
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "SportsEvent",
+          name: isFinished && match.home_score !== null && match.away_score !== null
+            ? `${homeName} ${match.home_score} - ${match.away_score} ${awayName}`
+            : `${homeName} ضد ${awayName}`,
+          startDate: match.match_date,
+          sport: "Soccer",
+          eventStatus: isFinished ? "https://schema.org/EventCompleted" : isLive ? "https://schema.org/EventActive" : "https://schema.org/EventScheduled",
+          ...(isFinished && match.home_score !== null && match.away_score !== null ? {
+            homeScore: { "@type": "Score", player: homeName, value: match.home_score },
+            awayScore: { "@type": "Score", player: awayName, value: match.away_score },
+          } : {}),
+          homeTeam: {
+            "@type": "SportsTeam",
+            name: homeName,
+            image: match.home_team?.logo_url,
+          },
+          awayTeam: {
+            "@type": "SportsTeam",
+            name: awayName,
+            image: match.away_team?.logo_url,
+          },
+          location: {
+            "@type": "Place",
+            name: translateName(match.league?.name || ""),
+          },
+          url: `${baseUrl}/match/${match.slug || match.id}`,
         },
-        awayTeam: {
-          "@type": "SportsTeam",
-          name: translateName(match.away_team?.name || ""),
-          image: match.away_team?.logo_url,
-        },
-        location: {
-          "@type": "Place",
-          name: translateName(match.league?.name || ""),
-        },
-        url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/match/${match.slug || match.id}`,
-      },
-    })),
+      };
+    }),
   };
 
   return (

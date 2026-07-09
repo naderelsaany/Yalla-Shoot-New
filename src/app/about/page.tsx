@@ -2,30 +2,58 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+
 export const metadata: Metadata = {
   title: 'من نحن',
-  description: 'تعرف على منصة يلا شوت نيو، الموقع الرياضي العربي الأول لتغطية الأخبار والمباريات بث مباشر.',
-  keywords: 'من نحن, يلا شوت نيو, موقع رياضي, بث مباشر, مباريات اليوم',
-  alternates: { canonical: '/about' }
+  description: 'تعرف على منصة يلا شوت نيو، الموقع الرياضي العربي الأول لتغطية الأخبار والمباريات بث مباشر. رؤيتنا ورسالتنا في تقديم محتوى رياضي احترافي للمشجع العربي.',
+  keywords: 'من نحن, يلا شوت نيو, موقع رياضي, منصة رياضية عربية, بث مباشر مباريات, يلا شوت, Yalla Shoot New, اخبار الرياضة, كرة قدم عربية',
+  alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'من نحن - يلا شوت نيو | منصة الرياضة العربية الأولى',
+    description: 'تعرف على منصة يلا شوت نيو، رؤيتنا ورسالتنا في تقديم محتوى رياضي احترافي للمشجع العربي.',
+    url: `${baseUrl}/about`,
+    type: 'website',
+    images: [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'من نحن - يلا شوت نيو',
+    description: 'تعرف على منصة يلا شوت نيو، الموقع الرياضي العربي الأول لتغطية الأخبار والمباريات.',
+  },
 };
 
 function AboutStructuredData() {
+  const breadcrumbData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${baseUrl}/about`,
+        'url': `${baseUrl}/about`,
+        'name': 'من نحن | يلا شوت نيو',
+        'description': 'تعرف على منصة يلا شوت نيو، الموقع الرياضي العربي الأول.',
+        'inLanguage': 'ar',
+        'about': {
+          '@type': 'Organization',
+          'name': 'يلا شوت نيو',
+          'url': baseUrl,
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'من نحن', item: `${baseUrl}/about` },
+        ],
+      },
+    ],
+  };
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "AboutPage",
-          "name": "من نحن | يلا شوت نيو",
-          "description": "تعرف على منصة يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/about`,
-          "mainEntity": {
-            "@type": "Organization",
-            "name": "يلا شوت نيو"
-          }
-        })
-      }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbData) }}
     />
   );
 }

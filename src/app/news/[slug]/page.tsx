@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { data: news } = await supabase
     .from("news")
-    .select("title, content, image_url, published_at")
+    .select("title, content, image_url, published_at, updated_at")
     .eq("slug", decodeURIComponent(slug))
     .single();
 
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: news.title,
     description: news.content?.substring(0, 160) || "أخبار رياضية حصرية",
-    keywords: `${news.title}, أخبار رياضية, يلا شوت نيو, كرة قدم`,
+    keywords: `${news.title}, أخبار رياضية, يلا شوت نيو, كرة قدم, انتقالات, الدوري المصري, الدوري السعودي, الدوري الانجليزي`,
     alternates: {
       canonical: `${baseUrl}/news/${slug}`,
     },
@@ -37,7 +37,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `${baseUrl}/news/${slug}`,
       type: "article",
       publishedTime: news.published_at,
-      images: news.image_url ? [{ url: news.image_url }] : [],
+      modifiedTime: news.updated_at || news.published_at,
+      images: news.image_url ? [{ url: news.image_url, width: 1200, height: 630, alt: news.title }] : [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+      locale: "ar_AR",
+      siteName: "يلا شوت نيو",
+      authors: ["يلا شوت نيو"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: news.title?.substring(0, 70),
+      description: news.content?.substring(0, 200),
+      images: news.image_url ? [news.image_url] : [`${baseUrl}/icon-192.png`],
+      creator: "@yallashootnew",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    other: {
+      'article:section': 'رياضة',
+      'article:tag': 'كرة قدم',
     },
   };
 }

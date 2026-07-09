@@ -1,28 +1,62 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+
 export const metadata: Metadata = {
   title: "اتصل بنا",
-  description: "تواصل مع فريق يلا شوت نيو لأي استفسارات أو اقتراحات.",
-  keywords: "اتصل بنا, يلا شوت نيو, تواصل",
-  alternates: {
-    canonical: '/contact',
+  description: "تواصل مع فريق يلا شوت نيو لأي استفسارات أو اقتراحات أو للإبلاغ عن مشكلة في الموقع. فريق الدعم الفني في خدمتك على مدار الساعة.",
+  keywords: "اتصل بنا, يلا شوت نيو, تواصل معنا, دعم فني, استفسارات, إعلانات, Yalla Shoot New contact",
+  alternates: { canonical: '/contact' },
+  openGraph: {
+    title: "اتصل بنا - يلا شوت نيو",
+    description: "تواصل مع فريق يلا شوت نيو لأي استفسارات أو اقتراحات.",
+    url: `${baseUrl}/contact`,
+    type: 'website',
+    images: [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "اتصل بنا - يلا شوت نيو",
+    description: "تواصل مع فريق يلا شوت نيو لأي استفسارات أو اقتراحات.",
   },
 };
 
 function ContactStructuredData() {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ContactPage',
+        '@id': `${baseUrl}/contact`,
+        'name': "اتصل بنا | يلا شوت نيو",
+        'description': "تواصل مع فريق يلا شوت نيو...",
+        'url': `${baseUrl}/contact`,
+        'inLanguage': 'ar',
+        'mainEntity': {
+          '@type': 'Organization',
+          'name': 'يلا شوت نيو',
+          'contactPoint': {
+            '@type': 'ContactPoint',
+            'email': 'info@yallashootnew.com',
+            'contactType': 'customer service',
+          },
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', position: 1, name: 'الرئيسية', item: baseUrl },
+          { '@type': 'ListItem', position: 2, name: 'اتصل بنا', item: `${baseUrl}/contact` },
+        ],
+      },
+    ],
+  };
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "ContactPage",
-          "name": "اتصل بنا | يلا شوت نيو",
-          "description": "تواصل مع فريق يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/contact`
-        })
-      }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
     />
   );
 }
