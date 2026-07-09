@@ -27,9 +27,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(decodedSlug);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
   let query = supabase
     .from("matches")
     .select(`
+      home_score,
+      away_score,
+      status,
+      match_date,
       home_team:teams!matches_home_team_id_fkey(id, name),
       away_team:teams!matches_away_team_id_fkey(id, name),
       league:leagues(name)
@@ -49,19 +54,69 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const home = translateName(matchData.home_team?.name || "");
   const away = translateName(matchData.away_team?.name || "");
   const league = translateName(matchData.league?.name || "");
+  
+  // Dynamic title based on match status
+  let title: string;
+  let description: string;
+  let ogTitle: string;
+  
+  if (matchData.status === "FINISHED" && matchData.home_score !== null && matchData.away_score !== null) {
+    const score = `${matchData.home_score}-${matchData.away_score}`;
+    title = `${home} ${matchData.home_score}-${matchData.away_score} ${away} — ${league} | يلا شوت نيو`;
+    description = `🔴 نتيجة مباراة ${home} ضد ${away} في ${league}: ${home} ${score} ${away}. ملخص وأهداف وأحداث المباراة الكاملة.`;
+    ogTitle = `${home} ${score} ${away} | ${league}`;
+  } else if (matchData.status === "IN_PLAY" || matchData.status === "LIVE") {
+    title = `🟢 ${home} ضد ${away} — ${league} (مباشر الآن) | يلا شوت نيو`;
+    description = `مشاهدة مباراة ${home} ضد ${away} في ${league} بث مباشر. أحداث المباراة لحظة بلحظة وتغطية حصرية.`;
+    ogTitle = `🟢 ${home} ضد ${away} — ${league} (مباشر)`;
+  } else {
+    title = `مباراة ${home} ضد ${away} — ${league} | يلا شوت نيو`;
+    description = `موعد مباراة ${home} ضد ${away} في بطولة ${league}، القنوات الناقلة، البث المباشر والتشكيل المتوقع.`;
+    ogTitle = `مباراة ${home} ضد ${away} — ${league}`;
+  }
+
+  // Build status-specific keywords
+  let resultKeywords = "";
+  if (matchData.status === "FINISHED" && matchData.home_score !== null && matchData.away_score !== null) {
+    const winner = matchData.home_score > matchData.away_score ? home : away;
+    resultKeywords = `نتيجة ${home} و ${away}, فوز ${winner}, ${home} ${matchData.home_score}-${matchData.away_score} ${away}, أهداف ${home} ${away}, ملخص مباراة ${home} ${away}, `;
+  } else if (matchData.status === "IN_PLAY" || matchData.status === "LIVE") {
+    resultKeywords = `${home} ضد ${away} مباشر, بث مباشر ${home} ${away}, نتيجة مباراة ${home} ${away} الآن, `;
+  } else {
+    resultKeywords = `موعد مباراة ${home} ${away}, موعد مباراة ${home} ضد ${away}, القنوات الناقلة ${home} ${away}, `;
+  }
 
   return {
-    title: `مباراة ${home} ضد ${away} — ${league}`,
-    description: `تغطية وتفاصيل ونتيجة مباراة ${home} ضد ${away} في بطولة ${league}. بث مباشر وأحداث اللحظة بلحظة.`,
-    keywords: `${home} ضد ${away}, نتيجة مباراة ${home} و ${away}, ${league}, بث مباشر, يلا شوت نيو, مباريات اليوم`,
+    title,
+    description,
+    keywords: `${home} ضد ${away}, نتيجة مباراة ${home} و ${away}, ${resultKeywords}${league}, بث مباشر, يلا شوت نيو, مباريات اليوم, كرة قدم, كورة لايف`,
     alternates: {
       canonical: `/match/${slug}`,
     },
     openGraph: {
-      title: `مباراة ${home} ضد ${away}`,
-      description: `تابع مباراة ${home} و${away} في ${league}`,
+      title: ogTitle,
+      description,
       url: `/match/${slug}`,
       type: "article",
+      publishedTime: matchData.match_date,
+      siteName: "يلا شوت نيو",
+      locale: "ar_AR",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
   };
 }
@@ -70,15 +125,19 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
   const homeName = translateName(match.home_team?.name || "");
   const awayName = translateName(match.away_team?.name || "");
   const leagueName = translateName(match.league?.name || "");
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+  const matchUrl = `${baseUrl}/match/${match.slug || match.id}`;
 
-  const structuredData = {
+  const structuredData: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
     name: `${homeName} ضد ${awayName}`,
     startDate: match.match_date,
     sport: "Soccer",
-    description: `مباراة ${homeName} ضد ${awayName} في بطولة ${leagueName}`,
-    url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/match/${match.slug || match.id}`,
+    description: match.status === "FINISHED" 
+      ? `مباراة ${homeName} ضد ${awayName} في بطولة ${leagueName}. النتيجة: ${homeName} ${match.home_score}-${match.away_score} ${awayName}`
+      : `مباراة ${homeName} ضد ${awayName} في بطولة ${leagueName}`,
+    url: matchUrl,
     homeTeam: {
       "@type": "SportsTeam",
       name: homeName,
@@ -99,6 +158,29 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
         ? "https://schema.org/EventCompleted" 
         : "https://schema.org/EventScheduled",
   };
+
+  // Add result data for finished matches (Google rich snippets)
+  if (match.status === "FINISHED" && match.home_score !== null && match.away_score !== null) {
+    structuredData.competitor = [
+      {
+        "@type": "SportsTeam",
+        name: homeName,
+        score: match.home_score,
+        image: match.home_team?.logo_url,
+      },
+      {
+        "@type": "SportsTeam",
+        name: awayName,
+        score: match.away_score,
+        image: match.away_team?.logo_url,
+      },
+    ];
+    structuredData.result = {
+      "@type": "SportsEvent",
+      homeTeam: { name: homeName, score: match.home_score },
+      awayTeam: { name: awayName, score: match.away_score },
+    };
+  }
 
   return (
     <>
@@ -257,12 +339,20 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ s
       </nav>
 
       <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-3xl p-6 md:p-10 shadow-[var(--shadow-elevated)] relative overflow-hidden mb-8">
-        <h1 className="sr-only">مباراة {homeName} ضد {awayName} في {leagueName}</h1>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[var(--color-accent)] opacity-5 blur-[100px] pointer-events-none"></div>
-
-        <div className="text-center mb-8">
-          <h2 className="text-xl md:text-2xl font-bold font-arabic text-[var(--color-text-primary)]">{leagueName}</h2>
-          <p className="text-[var(--color-text-secondary)] font-tajawal mt-2">{dateString} • {timeString}</p>
+        <h1 className="text-xl md:text-3xl font-bold font-arabic text-center text-[var(--color-text-primary)] mb-2">
+          {match.status === "FINISHED" 
+            ? `${homeName} ${match.home_score}-${match.away_score} ${awayName}`
+            : `${homeName} ضد ${awayName}`
+          }
+        </h1>
+        <div className="text-center mb-6">
+          <p className="text-[var(--color-text-secondary)] font-tajawal text-sm">{leagueName}</p>
+          <p className="text-[var(--color-text-secondary)] font-tajawal mt-1">{dateString} • {timeString}</p>
+          {match.status === "FINISHED" && (
+            <p className="text-sm font-bold text-[var(--color-text-secondary)] mt-2 bg-[var(--color-bg-elevated)] px-3 py-1 rounded-full border border-[var(--color-border-subtle)] inline-block">
+              نهاية المباراة
+            </p>
+          )}
         </div>
 
         <div className="flex items-center justify-between">
@@ -288,11 +378,6 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ s
                   <span className="flex items-center gap-1.5 text-sm font-bold text-[var(--color-live)] animate-pulse mt-2 bg-[var(--color-live)]/10 px-3 py-1 rounded-full border border-[var(--color-live)]/20">
                     <span className="w-2 h-2 rounded-full bg-[var(--color-live)]"></span>
                     مباشر الآن
-                  </span>
-                )}
-                {match.status === "FINISHED" && (
-                  <span className="text-sm font-bold text-[var(--color-text-secondary)] mt-2 bg-[var(--color-bg-elevated)] px-3 py-1 rounded-full border border-[var(--color-border-subtle)]">
-                    نهاية المباراة
                   </span>
                 )}
               </div>
