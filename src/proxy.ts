@@ -7,7 +7,7 @@ const protectedPrefixes = ['/admin', '/api/admin'];
 // Routes that bypass protection
 const publicRoutes = ['/admin/login', '/api/admin/login'];
 
-export default async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Check if it's a protected route
