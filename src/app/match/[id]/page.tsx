@@ -60,7 +60,7 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
     startDate: match.match_date,
     sport: "Soccer",
     description: `مباراة ${homeName} ضد ${awayName} في بطولة ${leagueName}`,
-    url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/match/${match.id}`,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/match/${match.id}`,
     homeTeam: {
       "@type": "SportsTeam",
       name: homeName,
@@ -99,7 +99,7 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
               "description": `بث مباشر لمباراة ${homeName} ضد ${awayName}`,
               "embedUrl": match.video_url,
               "uploadDate": match.match_date,
-              "thumbnailUrl": "https://yallashootnew.com/icon-192.png"
+              "thumbnailUrl": "https://yalla-shoot-new.vercel.app/icon-192.png"
             })
           }}
         />
@@ -117,7 +117,7 @@ function BreadcrumbStructuredData({ leagueName, matchTitle }: { leagueName: stri
         "@type": "ListItem",
         position: 1,
         name: "الرئيسية",
-        item: process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com",
+        item: process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app",
       },
       {
         "@type": "ListItem",

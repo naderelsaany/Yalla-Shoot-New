@@ -18,7 +18,7 @@ function AboutStructuredData() {
           "@type": "AboutPage",
           "name": "من نحن | يلا شوت نيو",
           "description": "تعرف على منصة يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/about`,
+          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/about`,
           "mainEntity": {
             "@type": "Organization",
             "name": "يلا شوت نيو"

@@ -26,12 +26,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: `${news.title} | يلا شوت نيو`,
     description: news.content?.substring(0, 160) || "أخبار رياضية حصرية",
     alternates: {
-      canonical: `https://yallashootnew.com/news/${slug}`,
+      canonical: `https://yalla-shoot-new.vercel.app/news/${slug}`,
     },
     openGraph: {
       title: news.title,
       description: news.content?.substring(0, 160),
-      url: `https://yallashootnew.com/news/${slug}`,
+      url: `https://yalla-shoot-new.vercel.app/news/${slug}`,
       type: "article",
       publishedTime: news.published_at,
       images: news.image_url ? [{ url: news.image_url }] : [],
@@ -52,24 +52,24 @@ function NewsArticleStructuredData({ news }: { news: News }) {
     author: {
       "@type": "Organization",
       name: "يلا شوت نيو",
-      url: "https://yallashootnew.com",
+      url: "https://yalla-shoot-new.vercel.app",
     },
     publisher: {
       "@type": "Organization",
       name: "يلا شوت نيو",
       logo: {
         "@type": "ImageObject",
-        url: "https://yallashootnew.com/icon-192.png",
+        url: "https://yalla-shoot-new.vercel.app/icon-192.png",
         width: 192,
         height: 192
       },
     },
     description: news.content?.substring(0, 200),
-    url: `https://yallashootnew.com/news/${news.slug}`,
+    url: `https://yalla-shoot-new.vercel.app/news/${news.slug}`,
     inLanguage: "ar",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://yallashootnew.com/news/${news.slug}`,
+      "@id": `https://yalla-shoot-new.vercel.app/news/${news.slug}`,
     },
   };
 

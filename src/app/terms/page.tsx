@@ -17,7 +17,7 @@ function TermsStructuredData() {
           "@type": "WebPage",
           "name": "شروط الاستخدام | يلا شوت نيو",
           "description": "اقرأ شروط الاستخدام لمنصة يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/terms`
+          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/terms`
         })
       }}
     />

@@ -30,7 +30,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"),
   manifest: '/manifest.json',
   title: {
     default: "يلا شوت نيو | Yalla Shoot New - بث مباشر لمباريات اليوم",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ar_AR",
-    url: "https://yallashootnew.com",
+    url: "https://yalla-shoot-new.vercel.app",
     siteName: "يلا شوت نيو",
     title: "يلا شوت نيو | Yalla Shoot New",
     description: "تابع مباريات اليوم بث مباشر وتغطية حصرية لبطولة كأس العالم.",
@@ -70,12 +70,12 @@ export const metadata: Metadata = {
     google: "cNHfGJiXXVT2uaJ8q7mofplDpWfTNvatP1Sqsz6syiU",
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com",
+    canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app",
     languages: {
-      'ar': process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com",
+      'ar': process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app",
     },
     types: {
-      'application/rss+xml': `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/rss.xml`,
+      'application/rss+xml': `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/rss.xml`,
     },
   },
 };
@@ -86,13 +86,13 @@ function StructuredData() {
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://yallashootnew.com/#organization",
+        "@id": "https://yalla-shoot-new.vercel.app/#organization",
         name: "يلا شوت نيو",
         alternateName: "Yalla Shoot New",
-        url: "https://yallashootnew.com",
+        url: "https://yalla-shoot-new.vercel.app",
         logo: {
           "@type": "ImageObject",
-          url: "https://yallashootnew.com/icon-192.png",
+          url: "https://yalla-shoot-new.vercel.app/icon-192.png",
           width: 192,
           height: 192,
           caption: "يلا شوت نيو",
@@ -105,18 +105,18 @@ function StructuredData() {
       },
       {
         "@type": "WebSite",
-        "@id": "https://yallashootnew.com/#website",
-        url: "https://yallashootnew.com",
+        "@id": "https://yalla-shoot-new.vercel.app/#website",
+        url: "https://yalla-shoot-new.vercel.app",
         name: "يلا شوت نيو",
         alternateName: "Yalla Shoot New",
         publisher: {
-          "@id": "https://yallashootnew.com/#organization",
+          "@id": "https://yalla-shoot-new.vercel.app/#organization",
         },
         potentialAction: {
           "@type": "SearchAction",
           target: {
             "@type": "EntryPoint",
-            urlTemplate: "https://yallashootnew.com/matches?q={search_term_string}",
+            urlTemplate: "https://yalla-shoot-new.vercel.app/matches?q={search_term_string}",
           },
           "query-input": "required name=search_term_string",
         },

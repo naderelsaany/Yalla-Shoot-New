@@ -19,7 +19,7 @@ function ContactStructuredData() {
           "@type": "ContactPage",
           "name": "اتصل بنا | يلا شوت نيو",
           "description": "تواصل مع فريق يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/contact`
+          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/contact`
         })
       }}
     />

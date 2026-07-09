@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yallashootnew.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
   const { data: news } = await supabase
     .from('news')
     .select('title, slug, content, published_at, image_url')

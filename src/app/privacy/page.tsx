@@ -17,7 +17,7 @@ function PrivacyStructuredData() {
           "@type": "WebPage",
           "name": "سياسة الخصوصية | يلا شوت نيو",
           "description": "اقرأ سياسة الخصوصية الخاصة بمنصة يلا شوت نيو...",
-          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/privacy`
+          "url": `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/privacy`
         })
       }}
     />

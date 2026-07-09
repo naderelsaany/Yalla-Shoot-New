@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ page?: string }> }): Promise<Metadata> {
   const { page } = await searchParams;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yallashootnew.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
   const canonicalUrl = page && page !== '1' ? `${baseUrl}/news?page=${page}` : `${baseUrl}/news`;
 
   return {
@@ -29,13 +29,13 @@ function NewsBreadcrumbsStructuredData() {
         '@type': 'ListItem',
         position: 1,
         name: 'الرئيسية',
-        item: 'https://yallashootnew.com',
+        item: 'https://yalla-shoot-new.vercel.app',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'الأخبار',
-        item: 'https://yallashootnew.com/news',
+        item: 'https://yalla-shoot-new.vercel.app/news',
       },
     ],
   };

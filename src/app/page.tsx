@@ -48,7 +48,7 @@ function HomeStructuredData({ matches }: { matches: MatchWithTeams[] }) {
           "@type": "Place",
           name: translateName(match.league?.name || ""),
         },
-        url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/match/${match.id}`,
+        url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/match/${match.id}`,
       },
     })),
   };
