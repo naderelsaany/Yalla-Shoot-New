@@ -16,15 +16,22 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const { data: match } = await supabase
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(decodedSlug);
+  let query = supabase
     .from("matches")
     .select(`
       home_team:teams!matches_home_team_id_fkey(id, name),
       away_team:teams!matches_away_team_id_fkey(id, name),
       league:leagues(name)
-    `)
-    .or(`slug.eq.${decodedSlug},id.eq.${decodedSlug}`)
-    .single();
+    `);
+    
+  if (isUUID) {
+    query = query.or(`slug.eq.${decodedSlug},id.eq.${decodedSlug}`);
+  } else {
+    query = query.eq("slug", decodedSlug);
+  }
+
+  const { data: match } = await query.single();
 
   if (!match) return { title: "مباراة غير موجودة | يلا شوت نيو" };
 
@@ -140,10 +147,11 @@ function BreadcrumbStructuredData({ leagueName, matchTitle }: { leagueName: stri
   );
 }
 
-export default async function MatchDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-
-  const { data: matchData } = await supabase
+export default async function MatchDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(decodedSlug);
+  let query = supabase
     .from("matches")
     .select(`
       id,
@@ -152,12 +160,19 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
       home_score,
       away_score,
       video_url,
+      slug,
       home_team:teams!matches_home_team_id_fkey(id, name, logo_url),
       away_team:teams!matches_away_team_id_fkey(id, name, logo_url),
       league:leagues(name)
-    `)
-    .eq("id", id)
-    .single();
+    `);
+
+  if (isUUID) {
+    query = query.or(`slug.eq.${decodedSlug},id.eq.${decodedSlug}`);
+  } else {
+    query = query.eq("slug", decodedSlug);
+  }
+
+  const { data: matchData } = await query.single();
 
   const match = matchData as unknown as MatchWithTeams | null;
 
