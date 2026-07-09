@@ -31,6 +31,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"),
+  manifest: '/manifest.json',
   title: {
     default: "يلا شوت نيو | Yalla Shoot New - بث مباشر لمباريات اليوم",
     template: "%s",
