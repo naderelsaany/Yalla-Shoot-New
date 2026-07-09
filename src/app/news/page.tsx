@@ -97,6 +97,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
                       fill
                       className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      unoptimized={news.image_url.startsWith('http')}
                     />
                   </div>
                 ) : (
