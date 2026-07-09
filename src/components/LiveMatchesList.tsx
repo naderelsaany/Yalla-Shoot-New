@@ -32,6 +32,7 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
                 .from('matches')
                 .select(`
                   id,
+                  slug,
                   match_date,
                   status,
                   home_score,
@@ -68,6 +69,7 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
                 .from('matches')
                 .select(`
                   id,
+                  slug,
                   match_date,
                   status,
                   home_score,
@@ -118,6 +120,7 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
           <MatchCard 
             key={match.id}
             id={match.id}
+            slug={match.slug || undefined}
             homeTeam={translateName(match.home_team?.name || 'فريق')}
             awayTeam={translateName(match.away_team?.name || 'فريق')}
             homeLogo={match.home_team?.logo_url ?? undefined}

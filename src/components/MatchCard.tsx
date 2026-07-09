@@ -3,6 +3,7 @@ import TeamLogo from './TeamLogo';
 
 export interface MatchCardProps {
   id: string;
+  slug?: string;
   homeTeam: string;
   awayTeam: string;
   homeLogo?: string;
@@ -29,6 +30,7 @@ const statusLabels: Record<string, { label: string; color: string; live?: boolea
 
 export default function MatchCard({
   id,
+  slug,
   homeTeam,
   awayTeam,
   homeLogo,
