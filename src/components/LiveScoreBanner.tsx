@@ -22,9 +22,9 @@ export default function LiveScoreBanner() {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setTimeout(() => setIsMounted(true), 0);
     if (localStorage.getItem('hide-live-banner') === 'true') {
-      setIsClosed(true);
+      setTimeout(() => setIsClosed(true), 0);
     }
   }, []);
 
@@ -56,7 +56,7 @@ export default function LiveScoreBanner() {
               away_score: item.away_score,
               home_team: item.home_team ? { id: item.home_team.id, name: item.home_team.name } : null,
               away_team: item.away_team ? { id: item.away_team.id, name: item.away_team.name } : null,
-              slug: (item as any).slug,
+              slug: item.slug,
             }));
           setLiveMatches(formattedMatches);
           setIsVisible(formattedMatches.length > 0);
@@ -70,8 +70,28 @@ export default function LiveScoreBanner() {
 
     fetchLiveMatches();
 
-    const interval = setInterval(fetchLiveMatches, 15000);
-    return () => clearInterval(interval);
+    const channel = supabase
+      .channel('live-banner')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'matches' },
+        () => {
+          fetchLiveMatches();
+        }
+      )
+      .subscribe();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchLiveMatches();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      supabase.removeChannel(channel);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isClosed]);
 
   useEffect(() => {

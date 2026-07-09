@@ -98,10 +98,11 @@ export async function GET(request: Request) {
 
       const rawHome = translateName(match.homeTeam.name);
       const rawAway = translateName(match.awayTeam.name);
-      const safeHome = rawHome.replace(/\s+/g, '-');
-      const safeAway = rawAway.replace(/\s+/g, '-');
+      const safeHome = rawHome.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
+      const safeAway = rawAway.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
       const dateStr = match.utcDate.substring(0, 10);
-      const slug = `مباراة-${safeHome}-ضد-${safeAway}-${dateStr}`;
+      const shortId = crypto.randomUUID().substring(0, 8);
+      const slug = `مباراة-${safeHome}-ضد-${safeAway}-${dateStr}-${shortId}`;
 
       const matchPayload = {
         league_id: league.id,

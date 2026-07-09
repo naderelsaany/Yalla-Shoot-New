@@ -1,4 +1,4 @@
-﻿export const translateName = (englishName: string): string => {
+export const translateName = (englishName: string): string => {
   if (!englishName) return '';
   const dictionary: Record<string, string> = {
     'Egypt': 'مصر',
@@ -37,6 +37,15 @@
     'AC Milan': 'ميلان',
     'FC Bayern München': 'بايرن ميونخ',
     'Paris Saint-Germain FC': 'باريس سان جيرمان',
+    'Al Ahly SC': 'الأهلي',
+    'Zamalek SC': 'الزمالك',
+    'Al Hilal SFC': 'الهلال',
+    'Al Nassr FC': 'النصر',
+    'Al Ittihad FC': 'الاتحاد',
+    'Egyptian Premier League': 'الدوري المصري',
+    'Saudi Pro League': 'الدوري السعودي',
+    'CAF Champions League': 'دوري أبطال أفريقيا',
+    'AFC Champions League': 'دوري أبطال آسيا',
   };
   return dictionary[englishName] || englishName;
 };

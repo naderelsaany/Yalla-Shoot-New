@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { translateName } from '@/lib/translations';
 
 export async function POST(request: Request) {
   try {
@@ -57,6 +58,21 @@ export async function POST(request: Request) {
       .lte('match_date', endOfDay.toISOString())
       .maybeSingle();
 
+    const { data: teamsData } = await supabase.from('teams').select('id, name').in('id', [home_team_id, away_team_id]);
+    let homeTeamName = 'فريق';
+    let awayTeamName = 'فريق';
+    if (teamsData) {
+      const home = teamsData.find(t => t.id === home_team_id);
+      const away = teamsData.find(t => t.id === away_team_id);
+      if (home) homeTeamName = translateName(home.name);
+      if (away) awayTeamName = translateName(away.name);
+    }
+    const safeHome = homeTeamName.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
+    const safeAway = awayTeamName.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
+    const dateStr = dateObj.toISOString().substring(0, 10);
+    const shortId = crypto.randomUUID().substring(0, 8);
+    const slug = `مباراة-${safeHome}-ضد-${safeAway}-${dateStr}-${shortId}`;
+
     const payload = {
       league_id,
       home_team_id,
@@ -66,6 +82,7 @@ export async function POST(request: Request) {
       home_score: home_score !== '' && home_score !== null && home_score !== undefined ? parseInt(home_score) : null,
       away_score: away_score !== '' && away_score !== null && away_score !== undefined ? parseInt(away_score) : null,
       video_url: video_url || null,
+      slug: slug,
     };
 
     if (existingMatch) {

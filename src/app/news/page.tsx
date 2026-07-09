@@ -21,6 +21,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 export const revalidate = 60; // ISR
 
 function NewsBreadcrumbsStructuredData() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
   const breadcrumbData = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -29,13 +30,13 @@ function NewsBreadcrumbsStructuredData() {
         '@type': 'ListItem',
         position: 1,
         name: 'الرئيسية',
-        item: 'https://yalla-shoot-new.vercel.app',
+        item: baseUrl,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'الأخبار',
-        item: 'https://yalla-shoot-new.vercel.app/news',
+        item: `${baseUrl}/news`,
       },
     ],
   };
@@ -97,7 +98,6 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
                       fill
                       className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      unoptimized={news.image_url.startsWith('http')}
                     />
                   </div>
                 ) : (

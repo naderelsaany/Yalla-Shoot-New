@@ -9,7 +9,17 @@ import { MatchWithTeams } from "@/types/database";
 export const revalidate = 30;
 
 export async function generateStaticParams() {
-  const { data: matches } = await supabase.from('matches').select('id, slug').gte('match_date', new Date().toISOString().split('T')[0]).limit(50);
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - 1);
+  const endDate = new Date();
+  endDate.setMonth(endDate.getMonth() + 1);
+
+  const { data: matches } = await supabase
+    .from('matches')
+    .select('id, slug')
+    .gte('match_date', startDate.toISOString())
+    .lte('match_date', endDate.toISOString())
+    .limit(200);
   return matches?.map((match) => ({ slug: match.slug || match.id })) || [];
 }
 
@@ -43,6 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `مباراة ${home} ضد ${away} | ${league}`,
     description: `تغطية وتفاصيل ونتيجة مباراة ${home} ضد ${away} في بطولة ${league}. بث مباشر وأحداث اللحظة بلحظة.`,
+    keywords: `${home} ضد ${away}, نتيجة مباراة ${home} و ${away}, ${league}, بث مباشر, يلا شوت نيو`,
     alternates: {
       canonical: `/match/${slug}`,
     },
@@ -190,37 +201,33 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ s
 
   if (match.home_team?.name) {
     try {
-        const safeHomeName = match.home_team.name.replace(/"/g, '""');
-        const { data } = await supabase
-          .from("players")
-          .select("id, name")
-          .or(`club.eq."${safeHomeName}",national_team.eq."${safeHomeName}"`);
-      homePlayers = data || [];
-      if (homePlayers.length === 0) {
-        const { data: data2 } = await supabase
+        const { data: dataClub } = await supabase
           .from("players")
           .select("id, name")
           .eq("club", match.home_team.name);
-        homePlayers = data2 || [];
-      }
+        const { data: dataNational } = await supabase
+          .from("players")
+          .select("id, name")
+          .eq("national_team", match.home_team.name);
+        
+        const merged = [...(dataClub || []), ...(dataNational || [])];
+        homePlayers = Array.from(new Map(merged.map(p => [p.id, p])).values());
     } catch {}
   }
 
   if (match.away_team?.name) {
     try {
-        const safeAwayName = match.away_team.name.replace(/"/g, '""');
-        const { data } = await supabase
-          .from("players")
-          .select("id, name")
-          .or(`club.eq."${safeAwayName}",national_team.eq."${safeAwayName}"`);
-      awayPlayers = data || [];
-      if (awayPlayers.length === 0) {
-        const { data: data2 } = await supabase
+        const { data: dataClub } = await supabase
           .from("players")
           .select("id, name")
           .eq("club", match.away_team.name);
-        awayPlayers = data2 || [];
-      }
+        const { data: dataNational } = await supabase
+          .from("players")
+          .select("id, name")
+          .eq("national_team", match.away_team.name);
+        
+        const merged = [...(dataClub || []), ...(dataNational || [])];
+        awayPlayers = Array.from(new Map(merged.map(p => [p.id, p])).values());
     } catch {}
   }
 
@@ -263,7 +270,7 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ s
             data-testid="team-link-home"
             className="flex flex-col items-center gap-4 flex-1"
           >
-            <TeamLogo src={match.home_team?.logo_url ?? undefined} alt={homeName} size="lg" />
+            <TeamLogo src={match.home_team?.logo_url ?? undefined} alt={homeName} size="lg" priority />
             <span className="text-lg md:text-2xl font-bold text-center text-[var(--color-text-primary)]">{homeName}</span>
           </div>
 
@@ -296,7 +303,7 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ s
             data-testid="team-link-away"
             className="flex flex-col items-center gap-4 flex-1"
           >
-            <TeamLogo src={match.away_team?.logo_url ?? undefined} alt={awayName} size="lg" />
+            <TeamLogo src={match.away_team?.logo_url ?? undefined} alt={awayName} size="lg" priority />
             <span className="text-lg md:text-2xl font-bold text-center text-[var(--color-text-primary)]">{awayName}</span>
           </div>
         </div>

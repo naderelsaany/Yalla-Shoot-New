@@ -7,6 +7,7 @@ import LiveScoreBanner from "@/components/LiveScoreBanner";
 import { supabase } from "@/lib/supabase";
 import { unstable_cache } from "next/cache";
 import { News } from "@/types/database";
+import Script from "next/script";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -29,8 +30,10 @@ export const viewport: Viewport = {
   themeColor: "#0a0e17",
 };
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"),
+  metadataBase: new URL(baseUrl),
   manifest: '/manifest.json',
   title: {
     default: "يلا شوت نيو | Yalla Shoot New - بث مباشر لمباريات اليوم",
@@ -55,7 +58,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ar_AR",
-    url: "https://yalla-shoot-new.vercel.app",
+    url: baseUrl,
     siteName: "يلا شوت نيو",
     title: "يلا شوت نيو | Yalla Shoot New",
     description: "تابع مباريات اليوم بث مباشر وتغطية حصرية لبطولة كأس العالم.",
@@ -70,29 +73,30 @@ export const metadata: Metadata = {
     google: "cNHfGJiXXVT2uaJ8q7mofplDpWfTNvatP1Sqsz6syiU",
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app",
+    canonical: baseUrl,
     languages: {
-      'ar': process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app",
+      'ar': baseUrl,
     },
     types: {
-      'application/rss+xml': `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/rss.xml`,
+      'application/rss+xml': `${baseUrl}/rss.xml`,
     },
   },
 };
 
 function StructuredData() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://yalla-shoot-new.vercel.app/#organization",
+        "@id": `${baseUrl}/#organization`,
         name: "يلا شوت نيو",
         alternateName: "Yalla Shoot New",
-        url: "https://yalla-shoot-new.vercel.app",
+        url: baseUrl,
         logo: {
           "@type": "ImageObject",
-          url: "https://yalla-shoot-new.vercel.app/icon-192.png",
+          url: `${baseUrl}/icon-192.png`,
           width: 192,
           height: 192,
           caption: "يلا شوت نيو",
@@ -105,18 +109,18 @@ function StructuredData() {
       },
       {
         "@type": "WebSite",
-        "@id": "https://yalla-shoot-new.vercel.app/#website",
-        url: "https://yalla-shoot-new.vercel.app",
+        "@id": `${baseUrl}/#website`,
+        url: baseUrl,
         name: "يلا شوت نيو",
         alternateName: "Yalla Shoot New",
         publisher: {
-          "@id": "https://yalla-shoot-new.vercel.app/#organization",
+          "@id": `${baseUrl}/#organization`,
         },
         potentialAction: {
           "@type": "SearchAction",
           target: {
             "@type": "EntryPoint",
-            urlTemplate: "https://yalla-shoot-new.vercel.app/matches?q={search_term_string}",
+            urlTemplate: `${baseUrl}/matches?q={search_term_string}`,
           },
           "query-input": "required name=search_term_string",
         },
@@ -161,6 +165,19 @@ export default async function RootLayout({
           <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />
         )}
         <StructuredData />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-2P6S4QFBJ2"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-2P6S4QFBJ2');
+          `}
+        </Script>
       </head>
       <body className="antialiased selection:bg-[var(--color-accent)] selection:text-white min-h-screen flex flex-col bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
         <Header />

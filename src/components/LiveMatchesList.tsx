@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import MatchCard, { MatchCardProps } from './MatchCard';
 import { supabase } from '@/lib/supabase';
 import { translateName } from '@/lib/translations';
-import { MatchWithTeams } from '@/types/database';
+import { MatchWithTeams, Match } from '@/types/database';
 
 export default function LiveMatchesList({ initialMatches }: { initialMatches: MatchWithTeams[] }) {
   const [matches, setMatches] = useState(initialMatches);
@@ -63,41 +63,54 @@ export default function LiveMatchesList({ initialMatches }: { initialMatches: Ma
                 });
             }
           } else if (payload.eventType === 'UPDATE') {
-            const newId = payload.new.id;
-            if (newId) {
-              supabase
-                .from('matches')
-                .select(`
-                  id,
-                  slug,
-                  match_date,
-                  status,
-                  home_score,
-                  away_score,
-                  home_team:teams!matches_home_team_id_fkey(name, logo_url),
-                  away_team:teams!matches_away_team_id_fkey(name, logo_url),
-                  league:leagues(name)
-                `)
-                .eq('id', newId)
-                .single()
-                .then((res) => {
-                  const error = res.error;
-                  const data = res.data as MatchWithTeams | null;
-                  if (error) {
-                    console.error('Error fetching full match data for realtime update:', error);
-                    return;
-                  }
-                  if (data) {
-                    setMatches((current) => {
-                      const exists = current.some((m) => m.id === data.id);
-                      if (exists) {
-                        return current.map((m) => (m.id === data.id ? data : m));
-                      } else {
-                        return [...current, data];
+            const newMatch = payload.new as Partial<Match>;
+            if (newMatch.id) {
+              setMatches((current) => {
+                const exists = current.find((m) => m.id === newMatch.id);
+                if (exists) {
+                  return current.map((m) => 
+                    m.id === newMatch.id 
+                      ? { 
+                          ...m, 
+                          status: newMatch.status, 
+                          home_score: newMatch.home_score, 
+                          away_score: newMatch.away_score,
+                          match_date: newMatch.match_date,
+                          slug: newMatch.slug
+                        } 
+                      : m
+                  );
+                } else {
+                  supabase
+                    .from('matches')
+                    .select(`
+                      id,
+                      slug,
+                      match_date,
+                      status,
+                      home_score,
+                      away_score,
+                      home_team:teams!matches_home_team_id_fkey(name, logo_url),
+                      away_team:teams!matches_away_team_id_fkey(name, logo_url),
+                      league:leagues(name)
+                    `)
+                    .eq('id', newMatch.id)
+                    .single()
+                    .then((res) => {
+                      const error = res.error;
+                      const data = res.data as MatchWithTeams | null;
+                      if (!error && data) {
+                        setMatches((curr) => {
+                          if (!curr.some(m => m.id === data.id)) {
+                            return [...curr, data];
+                          }
+                          return curr;
+                        });
                       }
                     });
-                  }
-                });
+                  return current;
+                }
+              });
             }
           }
         }

@@ -4,9 +4,10 @@ interface TeamLogoProps {
   src?: string;
   alt: string;
   size?: "sm" | "md" | "lg" | "xl";
+  priority?: boolean;
 }
 
-export default function TeamLogo({ src, alt, size = "md" }: TeamLogoProps) {
+export default function TeamLogo({ src, alt, size = "md", priority = false }: TeamLogoProps) {
   const sizeClasses = {
     sm: "w-8 h-8",
     md: "w-12 h-12",
@@ -32,7 +33,7 @@ export default function TeamLogo({ src, alt, size = "md" }: TeamLogoProps) {
           width={pixelSizes[size]}
           height={pixelSizes[size]}
           className="w-[85%] h-[85%] object-contain"
-          unoptimized={src.startsWith("http")}
+          priority={priority}
         />
       ) : (
         <span className="text-[var(--color-text-muted)] text-[0.6rem] font-tajawal">شعار</span>

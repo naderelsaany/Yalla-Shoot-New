@@ -20,6 +20,7 @@ const statusLabels: Record<string, { label: string; color: string; live?: boolea
   SCHEDULED: { label: 'مجدولة', color: 'text-[var(--color-text-muted)]' },
   TIMED: { label: 'موقوتة', color: 'text-[var(--color-text-muted)]' },
   IN_PLAY: { label: 'مباشر', color: 'text-[var(--color-live)]', live: true },
+  LIVE: { label: 'مباشر', color: 'text-[var(--color-live)]', live: true },
   PAUSED: { label: 'استراحة', color: 'text-yellow-500' },
   FINISHED: { label: 'انتهت', color: 'text-[var(--color-text-primary)]' },
   SUSPENDED: { label: 'معلقة', color: 'text-red-400' },

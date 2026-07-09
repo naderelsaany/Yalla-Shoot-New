@@ -22,16 +22,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!news) return { title: "خبر غير موجود | يلا شوت نيو" };
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+
   return {
     title: `${news.title} | يلا شوت نيو`,
     description: news.content?.substring(0, 160) || "أخبار رياضية حصرية",
     alternates: {
-      canonical: `https://yalla-shoot-new.vercel.app/news/${slug}`,
+      canonical: `${baseUrl}/news/${slug}`,
     },
     openGraph: {
       title: news.title,
       description: news.content?.substring(0, 160),
-      url: `https://yalla-shoot-new.vercel.app/news/${slug}`,
+      url: `${baseUrl}/news/${slug}`,
       type: "article",
       publishedTime: news.published_at,
       images: news.image_url ? [{ url: news.image_url }] : [],
@@ -42,6 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 import { News } from "@/types/database";
 
 function NewsArticleStructuredData({ news }: { news: News }) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -52,24 +55,24 @@ function NewsArticleStructuredData({ news }: { news: News }) {
     author: {
       "@type": "Organization",
       name: "يلا شوت نيو",
-      url: "https://yalla-shoot-new.vercel.app",
+      url: baseUrl,
     },
     publisher: {
       "@type": "Organization",
       name: "يلا شوت نيو",
       logo: {
         "@type": "ImageObject",
-        url: "https://yalla-shoot-new.vercel.app/icon-192.png",
+        url: `${baseUrl}/icon-192.png`,
         width: 192,
         height: 192
       },
     },
     description: news.content?.substring(0, 200),
-    url: `https://yalla-shoot-new.vercel.app/news/${news.slug}`,
+    url: `${baseUrl}/news/${news.slug}`,
     inLanguage: "ar",
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://yalla-shoot-new.vercel.app/news/${news.slug}`,
+      "@id": `${baseUrl}/news/${news.slug}`,
     },
   };
 
@@ -143,7 +146,6 @@ export default async function NewsDetailsPage({ params }: { params: Promise<{ sl
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 800px"
               priority
-              unoptimized={news.image_url.startsWith("http")}
             />
           </div>
         )}

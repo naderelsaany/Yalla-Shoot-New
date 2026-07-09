@@ -43,8 +43,10 @@ export async function GET(request: Request) {
         // Generate a simple slug from title or fallback to timestamp
         const slug = item.title.replace(/\s+/g, '-').replace(/[^\w\u0600-\u06FF-]/g, '') + '-' + Date.now();
 
-        const originalLink = item.link ? `\n\nالمصدر: ${item.link}` : '';
-        const content = (item.contentSnippet || item.content || '') + originalLink;
+        const rawContent = (item.contentSnippet || item.content || '');
+        const excerpt = rawContent.length > 300 ? rawContent.substring(0, 300) + '... ' : rawContent;
+        const originalLink = item.link ? `<br><br><a href="${item.link}" target="_blank" rel="nofollow noopener" style="color: var(--color-accent); font-weight: bold;">اقرأ الخبر كاملاً من المصدر الرسمي</a>` : '';
+        const content = excerpt + originalLink;
 
         const { error } = await supabase.from('news').insert({
           title: item.title,
