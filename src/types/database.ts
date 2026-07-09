@@ -22,6 +22,7 @@ export interface Match {
   away_team_id?: string | null;
   home_score: number | null;
   away_score: number | null;
+  slug?: string | null;
   status: 'SCHEDULED' | 'IN_PLAY' | 'FINISHED' | string;
   match_date: string;
   video_url?: string | null;

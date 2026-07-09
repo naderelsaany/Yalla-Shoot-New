@@ -9,40 +9,40 @@ import { MatchWithTeams } from "@/types/database";
 export const revalidate = 30;
 
 export async function generateStaticParams() {
-  const { data: matches } = await supabase.from('matches').select('id').order('match_date', { ascending: false }).limit(200);
-  return matches?.map(({ id }) => ({ id })) || [];
+  const { data: matches } = await supabase.from('matches').select('id, slug').gte('match_date', new Date().toISOString().split('T')[0]).limit(50);
+  return matches?.map((match) => ({ slug: match.slug || match.id })) || [];
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params;
-  const { data: matchData } = await supabase
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
+  const { data: match } = await supabase
     .from("matches")
     .select(`
       home_team:teams!matches_home_team_id_fkey(id, name),
       away_team:teams!matches_away_team_id_fkey(id, name),
       league:leagues(name)
     `)
-    .eq("id", id)
+    .or(`slug.eq.${decodedSlug},id.eq.${decodedSlug}`)
     .single();
-
-  const match = matchData as unknown as MatchWithTeams | null;
 
   if (!match) return { title: "مباراة غير موجودة | يلا شوت نيو" };
 
-  const home = translateName(match.home_team?.name || "");
-  const away = translateName(match.away_team?.name || "");
-  const league = translateName(match.league?.name || "");
+  const matchData = match as unknown as MatchWithTeams;
+  const home = translateName(matchData.home_team?.name || "");
+  const away = translateName(matchData.away_team?.name || "");
+  const league = translateName(matchData.league?.name || "");
 
   return {
     title: `مباراة ${home} ضد ${away} | ${league}`,
     description: `تغطية وتفاصيل ونتيجة مباراة ${home} ضد ${away} في بطولة ${league}. بث مباشر وأحداث اللحظة بلحظة.`,
     alternates: {
-      canonical: `/match/${id}`,
+      canonical: `/match/${slug}`,
     },
     openGraph: {
       title: `مباراة ${home} ضد ${away}`,
       description: `تابع مباراة ${home} و${away} في ${league}`,
-      url: `/match/${id}`,
+      url: `/match/${slug}`,
       type: "article",
     },
   };
@@ -60,7 +60,7 @@ function MatchStructuredData({ match }: { match: MatchWithTeams }) {
     startDate: match.match_date,
     sport: "Soccer",
     description: `مباراة ${homeName} ضد ${awayName} في بطولة ${leagueName}`,
-    url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/match/${match.id}`,
+    url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app"}/match/${match.slug || match.id}`,
     homeTeam: {
       "@type": "SportsTeam",
       name: homeName,

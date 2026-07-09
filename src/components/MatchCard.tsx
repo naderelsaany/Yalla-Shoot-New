@@ -43,7 +43,7 @@ export default function MatchCard({
   const statusInfo = statusLabels[status] || statusLabels.SCHEDULED;
 
   return (
-    <Link href={`/match/${id}`} className="group relative block overflow-hidden rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-elevated)]">
+    <Link href={`/match/${slug || id}`} className="group relative block overflow-hidden rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-4 shadow-[var(--shadow-card)] transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-elevated)]">
       <div className="absolute -top-10 -right-10 w-32 h-32 bg-[var(--color-accent)] opacity-5 blur-3xl rounded-full pointer-events-none"></div>
 
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--color-border-subtle)]">

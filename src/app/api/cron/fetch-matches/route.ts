@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabase';
+import { translateName } from '@/lib/translations';
 
 const API_KEY = process.env.FOOTBALL_DATA_API_KEY;
 
@@ -95,6 +96,13 @@ export async function GET(request: Request) {
         .lte('match_date', match.utcDate.substring(0, 10) + 'T23:59:59Z')
         .maybeSingle();
 
+      const rawHome = translateName(match.homeTeam.name);
+      const rawAway = translateName(match.awayTeam.name);
+      const safeHome = rawHome.replace(/\s+/g, '-');
+      const safeAway = rawAway.replace(/\s+/g, '-');
+      const dateStr = match.utcDate.substring(0, 10);
+      const slug = `مباراة-${safeHome}-ضد-${safeAway}-${dateStr}`;
+
       const matchPayload = {
         league_id: league.id,
         home_team_id: homeTeam.id,
@@ -103,6 +111,7 @@ export async function GET(request: Request) {
         status: match.status,
         home_score: match.score?.fullTime?.home ?? null,
         away_score: match.score?.fullTime?.away ?? null,
+        slug: slug,
       };
 
       if (existingMatch) {

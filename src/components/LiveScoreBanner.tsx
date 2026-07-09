@@ -12,6 +12,7 @@ interface Match {
   home_score: number;
   away_score: number;
   status: string;
+  slug?: string;
 }
 
 export default function LiveScoreBanner() {
@@ -34,7 +35,7 @@ export default function LiveScoreBanner() {
       try {
         const { data, error } = await supabase
           .from('matches')
-          .select('id, status, home_score, away_score, home_team:teams!matches_home_team_id_fkey(id, name), away_team:teams!matches_away_team_id_fkey(id, name)')
+          .select('id, slug, status, home_score, away_score, home_team:teams!matches_home_team_id_fkey(id, name), away_team:teams!matches_away_team_id_fkey(id, name)')
           .in('status', ['IN_PLAY', 'LIVE'])
           .not('home_team', 'is', null)
           .not('away_team', 'is', null);
@@ -55,6 +56,7 @@ export default function LiveScoreBanner() {
               away_score: item.away_score,
               home_team: item.home_team ? { id: item.home_team.id, name: item.home_team.name } : null,
               away_team: item.away_team ? { id: item.away_team.id, name: item.away_team.name } : null,
+              slug: (item as any).slug,
             }));
           setLiveMatches(formattedMatches);
           setIsVisible(formattedMatches.length > 0);
@@ -107,7 +109,7 @@ export default function LiveScoreBanner() {
           {liveMatches.map((match) => (
             <Link
               key={match.id}
-              href={`/match/${match.id}`}
+              href={`/match/${match.slug || match.id}`}
               className="flex items-center gap-3 hover:bg-[var(--color-bg-primary)] px-3 py-1 rounded-lg transition-colors text-sm font-tajawal text-[var(--color-text-primary)]"
             >
               <span>{match.home_team?.name}</span>
