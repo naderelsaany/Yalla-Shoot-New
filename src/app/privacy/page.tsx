@@ -2,8 +2,9 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'سياسة الخصوصية | يلا شوت نيو',
+  title: 'سياسة الخصوصية',
   description: 'سياسة الخصوصية لموقع يلا شوت نيو وتفاصيل جمع البيانات والإعلانات.',
+  keywords: 'سياسة الخصوصية, يلا شوت نيو',
   alternates: { canonical: '/privacy' }
 };
 

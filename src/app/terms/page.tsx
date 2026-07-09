@@ -2,8 +2,9 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'الشروط والأحكام | يلا شوت نيو',
+  title: 'الشروط والأحكام',
   description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو.',
+  keywords: 'الشروط والأحكام, يلا شوت نيو',
   alternates: { canonical: '/terms' }
 };
 
