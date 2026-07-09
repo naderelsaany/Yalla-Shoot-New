@@ -64,6 +64,7 @@ function WorldCupHubContent() {
   const [standings, setStandings] = useState<StandingRow[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [scorers, setScorers] = useState<Scorer[]>([]);
+  const [stats, setStats] = useState({ totalGoals: 0, totalMatches: 0 });
 
   useEffect(() => {
     let active = true;
@@ -91,7 +92,13 @@ function WorldCupHubContent() {
           setStandings(standingsRes.data as unknown as StandingRow[]);
         }
         if (matchesRes.data) {
-          setMatches(matchesRes.data as unknown as Match[]);
+          const matchData = matchesRes.data as unknown as Match[];
+          setMatches(matchData);
+          
+          // Calculate stats
+          const totalGoals = matchData.reduce((acc, m) => acc + (m.home_score || 0) + (m.away_score || 0), 0);
+          const totalMatches = matchData.filter(m => m.status === 'FINISHED' || m.status === 'IN_PLAY').length;
+          setStats({ totalGoals, totalMatches });
         }
         if (scorersRes.data) {
           setScorers(scorersRes.data as unknown as Scorer[]);
@@ -119,7 +126,7 @@ function WorldCupHubContent() {
       </nav>
 
       {/* Header */}
-      <header className="mb-10 text-center">
+      <header className="mb-8 text-center">
         <h1 className="text-3xl md:text-5xl font-bold font-arabic text-[var(--color-text-primary)] mb-2">
           كأس العالم
         </h1>
@@ -127,6 +134,28 @@ function WorldCupHubContent() {
           تغطية حصرية وحية لبطولة كأس العالم - ترتيب المجموعات، الهدافين، والمباريات المباشرة
         </p>
       </header>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-4 text-center shadow-sm">
+          <span className="block text-[var(--color-text-secondary)] text-sm mb-1">المباريات الملعوبة</span>
+          <span className="block text-2xl font-bold text-[var(--color-text-primary)]">{stats.totalMatches}</span>
+        </div>
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-4 text-center shadow-sm">
+          <span className="block text-[var(--color-text-secondary)] text-sm mb-1">إجمالي الأهداف</span>
+          <span className="block text-2xl font-bold text-[var(--color-text-primary)]">{stats.totalGoals}</span>
+        </div>
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-4 text-center shadow-sm">
+          <span className="block text-[var(--color-text-secondary)] text-sm mb-1">متوسط التهديف</span>
+          <span className="block text-2xl font-bold text-[var(--color-text-primary)]">
+            {stats.totalMatches > 0 ? (stats.totalGoals / stats.totalMatches).toFixed(1) : '0.0'}
+          </span>
+        </div>
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-4 text-center shadow-sm">
+          <span className="block text-[var(--color-text-secondary)] text-sm mb-1">المجموعات</span>
+          <span className="block text-2xl font-bold text-[var(--color-text-primary)]">8</span>
+        </div>
+      </div>
 
       {/* Group Selector */}
       <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">

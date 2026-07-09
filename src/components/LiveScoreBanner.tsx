@@ -32,7 +32,9 @@ export default function LiveScoreBanner() {
         const { data, error } = await supabase
           .from('matches')
           .select('id, status, home_score, away_score, home_team:teams!matches_home_team_id_fkey(id, name), away_team:teams!matches_away_team_id_fkey(id, name)')
-          .in('status', ['IN_PLAY', 'LIVE']);
+          .in('status', ['IN_PLAY', 'LIVE'])
+          .not('home_team', 'is', null)
+          .not('away_team', 'is', null);
 
         if (error) {
           console.error(error);

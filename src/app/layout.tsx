@@ -30,10 +30,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://yallashootnew.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"),
   title: {
     default: "يلا شوت نيو | Yalla Shoot New - بث مباشر لمباريات اليوم",
-    template: "%s | يلا شوت نيو",
+    template: "%s",
   },
   description: "تابع مباريات اليوم بث مباشر بدون تقطيع، أهداف المباريات، ترتيب الدوري، وأحدث الأخبار الرياضية على يلا شوت نيو. تغطية حصرية لبطولة كأس العالم، دوري أبطال أوروبا، والدوريات الكبرى.",
   keywords: ["يلا شوت", "يلا شوت نيو", "بث مباشر", "مباريات اليوم", "كأس العالم", "اهداف اليوم", "yalla shoot", "دوري ابطال اوروبا", "كورة لايف", "ريال مدريد", "برشلونة"],
@@ -78,7 +78,13 @@ export const metadata: Metadata = {
     google: "cNHfGJiXXVT2uaJ8q7mofplDpWfTNvatP1Sqsz6syiU",
   },
   alternates: {
-    canonical: "https://yallashootnew.com",
+    canonical: process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com",
+    languages: {
+      'ar': process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com",
+    },
+    types: {
+      'application/rss+xml': `${process.env.NEXT_PUBLIC_BASE_URL || "https://yallashootnew.com"}/rss.xml`,
+    },
   },
 };
 

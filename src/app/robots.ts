@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://yallashootnew.com'; // Replace with actual domain when deployed
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yallashootnew.com'; // Replace with actual domain when deployed
 
   return {
     rules: {

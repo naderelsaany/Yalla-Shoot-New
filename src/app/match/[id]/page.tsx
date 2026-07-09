@@ -135,6 +135,7 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
       status,
       home_score,
       away_score,
+      video_url,
       home_team:teams!matches_home_team_id_fkey(id, name, logo_url),
       away_team:teams!matches_away_team_id_fkey(id, name, logo_url),
       league:leagues(name)
@@ -275,6 +276,23 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
+      {match.video_url && (
+        <div className="mt-8 mb-8 bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-4 shadow-sm">
+          <h2 className="font-bold font-arabic text-lg text-[var(--color-text-primary)] mb-4">البث المباشر</h2>
+          <div className="aspect-video w-full bg-black rounded-xl overflow-hidden shadow-inner">
+            {match.video_url.includes('youtube.com') || match.video_url.includes('youtu.be') ? (
+              <iframe
+                src={match.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'www.youtube.com/embed/')}
+                className="w-full h-full"
+                allowFullScreen
+              />
+            ) : (
+              <video controls className="w-full h-full" src={match.video_url} />
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-2xl p-6 shadow-sm mb-8">
         <h2 className="text-lg font-bold font-arabic text-[var(--color-text-primary)] mb-4">قائمة اللاعبين (التشكيل)</h2>
         <div className="grid grid-cols-2 gap-4">
@@ -282,7 +300,7 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
             <h3 className="font-bold text-sm text-[var(--color-text-secondary)] mb-2">تشكيلة أصحاب الأرض</h3>
             <ul>
               {homePlayers.length === 0 ? (
-                <li className="text-xs text-[var(--color-text-muted)]">لا يوجد لاعبين مسجلين</li>
+                <li className="text-sm text-[var(--color-text-secondary)]">سيتم إضافة قائمة اللاعبين قريباً</li>
               ) : (
                 homePlayers.map((p) => (
                   <li key={p.id} className="mb-1">
@@ -298,7 +316,7 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ i
             <h3 className="font-bold text-sm text-[var(--color-text-secondary)] mb-2">تشكيلة الضيوف</h3>
             <ul>
               {awayPlayers.length === 0 ? (
-                <li className="text-xs text-[var(--color-text-muted)]">لا يوجد لاعبين مسجلين</li>
+                <li className="text-sm text-[var(--color-text-secondary)]">سيتم إضافة قائمة اللاعبين قريباً</li>
               ) : (
                 awayPlayers.map((p) => (
                   <li key={p.id} className="mb-1">

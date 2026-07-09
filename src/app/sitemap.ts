@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { League, Match, News } from '@/types/database';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://yallashootnew.com'; // Replace with actual domain when deployed
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yallashootnew.com'; // Replace with actual domain when deployed
 
   // Fetch dynamic routes
   const { data: leagues } = await supabase.from('leagues').select('id, updated_at');
