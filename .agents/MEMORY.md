@@ -5,192 +5,155 @@
 
 ---
 
-## 🚨 قاعدة إلزامية حاكمة (أولوية قصوى)
-**إلزامي جداً قبل أي رد:** يجب مراجعة قواعد هذه الذاكرة الدائمة جيداً. ممنوع التسرع نهائياً في الإجابة أو التنفيذ. الوقت ليس مهماً، الأهم هو الدقة المتناهية والتفكير العميق قبل اتخاذ أي خطوة.
-
----
-
-## 📌 معلومات المشروع الأساسية
+## 📌 معلومات المشروع
 
 | المعلومة | القيمة |
 |----------|--------|
 | اسم المشروع | يلا شوت نيو |
 | الاسم بالإنجليزي | Yalla Shoot New |
 | المالك | Nader Elsadany |
-| النوع | موقع رياضي لمتابعة المباريات والأخبار |
+| النوع | موقع رياضي عربي (RTL) لمتابعة المباريات والأخبار |
 | المنافس المباشر | yallasootlive.com |
-| الدومين الأساسي | https://yalla-shoot-new.vercel.app |
-| الهدف | التفوق على المنافس في التصميم والسرعة والسيو والمحتوى |
-| الحالة | **✅ جاهز للنشر (Production Ready)** |
+| الدومين | https://yalla-shoot-new.vercel.app |
+| GitHub | https://github.com/naderelsaany/Yalla-Shoot-New |
+| الحالة | **✅ Production Ready** |
 
 ---
 
-## 🔧 التقنيات المعتمدة
+## 🔧 التقنيات (Tech Stack)
 
-| العنصر | التقنية | الباقة |
-|--------|---------|--------|
-| Framework | Next.js 14+ (App Router) | - |
-| CSS | TailwindCSS v4 (RTL) | - |
-| Database | Firebase Firestore | Spark (مجاني) |
-| Auth | Firebase Authentication | مجاني |
-| Hosting | Vercel | Hobby (مجاني + دومين مجاني Vercel) |
-| Image CDN | Cloudinary | Free (25 credits/شهر) |
-| Analytics | Google Analytics 4 | مجاني |
-| Search Console | Google Search Console | مجاني |
-| Language | TypeScript | - |
-| Font | Cairo أو Tajawal | Google Fonts مجاني |
-
----
-
-## 💰 حدود الباقات المجانية (مرجع سريع)
-
-### Vercel Hobby
-- Bandwidth: 100 GB/شهر
-- Serverless Functions: 1 مليون/شهر
-- Build Minutes: محدودة
-- ⚠️ للاستخدام الشخصي فقط (غير تجاري رسمياً)
-
-### Firebase Spark
-- Firestore Reads: 50,000/يوم
-- Firestore Writes: 20,000/يوم
-- Firestore Deletes: 20,000/يوم
-- Firestore Storage: 1 GB
-- Hosting Storage: 10 GB
-- Hosting Bandwidth: 10 GB/شهر
-- Cloud Functions: 2 مليون/شهر
-- Auth: مجاني بلا حدود (email/Google)
-- ⚠️ لا يحتاج كريديت كارد
-
-### Cloudinary Free
-- 25 credit/شهر (rolling 30 يوم)
-- 1 credit = 1,000 image transformation أو 1 GB storage أو 1 GB bandwidth
+| العنصر | التقنية | ملاحظات |
+|--------|---------|---------|
+| Framework | Next.js 16.2.10 (App Router + Turbopack) | يستخدم `proxy.ts` بدل `middleware.ts` |
+| CSS | TailwindCSS v4 | RTL + Dark Mode |
+| Database | Supabase (PostgreSQL) | Realtime للمباريات المباشرة |
+| Hosting | Vercel | Hobby Plan (مجاني) |
+| Analytics | Google Analytics 4 | Measurement ID: G-2P6S4QFBJ2 |
+| Search Console | Google Search Console | مفعّل ومتحقق |
+| Language | TypeScript | صارم — لا JavaScript عادي |
+| Fonts | Cairo + Tajawal | Google Fonts |
+| Testing | Playwright | 7 ملفات E2E في `/e2e/` |
+| Sanitization | sanitize-html | لحماية محتوى الأخبار من XSS |
 
 ---
 
-## 📊 سجل التقدم (Changelog)
-
-### [2026-07-09] - تحسينات الأداء والـ SEO (رد DeepSeek)
-- **القرارات:** 
-  - الإبقاء على ملف `proxy.ts` بدلاً من `middleware.ts` لأن إصدار Next.js 16.2.10 (Turbopack) يدعم `proxy.ts` حصرياً بناءً على رسائل الـ Build، واقتراح DeepSeek كان مبنياً على إصدارات أقدم.
-  - تطبيق تقنية SSG عبر `generateStaticParams` للصفحات الديناميكية.
-- **ما تم تنفيذه:**
-  - إضافة `generateStaticParams` لمسارات (`/leagues/[id]`, `/match/[id]`, `/news/[slug]`) لتحسين سرعة التحميل وفهرسة جوجل.
-  - إنشاء ملفات `loading.tsx` لمسارات `match` و `leagues` لتحسين تجربة المستخدم.
-  - إضافة `alternates.canonical` لصفحات الأخبار والبطولات لتقوية الـ SEO.
-  - إضافة روابط `preconnect` في `layout.tsx` لتقليل الـ Latency للخطوط وقاعدة البيانات.
-  - تحسين مخرجات `rss.xml` بإضافة `lastBuildDate` و `generator`.
-- **المشاكل الحالية:** لا يوجد (تم تأكيد نجاح الـ Build بنسبة 100%).
-
-### [2026-07-09] - تنظيف المشروع وتحديث الهيكلة
-- ✅ حذف مجلدات `src/app/teams`, `src/app/world-cup`, `src/app/matches` بالكامل.
-- ✅ تنظيف الروابط في `Header.tsx` و `match/[id]/page.tsx` و `sitemap.ts`.
-- ✅ تشغيل `npm run build` بنجاح بعد تنظيف الـ Cache (صفر أخطاء).
-
-### [2026-07-09] - اعتماد الدومين الأساسي وتطبيق توصيات كلود
-- ✅ اعتماد الدومين `https://yalla-shoot-new.vercel.app` كدومين رسمي أساسي للموقع في كل الروابط والـ SEO والميتا داتا بدل الدومين الافتراضي القديم.
-- ✅ تحديث بيئة التطوير والذاكرة بهذا التغيير لمنع أي تضارب في السيو مستقبلاً.
-
-### 2026-07-09 — تنفيذ مراجعة DeepSeek
-- ✅ إزالة `instrumentation.ts` و `mockFetch` من الكود للإنتاج الحقيقي
-- ✅ تحسين الـ SEO (إصلاح تكرار العنوان، روابط Canonical صحيحة، وتحديث خريطة الموقع)
-- ✅ إضافة مسار RSS `src/app/rss.xml/route.ts` للأخبار
-- ✅ إنشاء صفحة `teams` لعرض كافة الفرق، وإضافتها للـ `Header`
-- ✅ تحسين صفحة `match/[id]` بإضافة فيديو البث وتحديث رسالة اللاعبين
-- ✅ إصلاح أخطاء شريط البث المباشر `LiveScoreBanner` 
-- ✅ إضافة إحصائيات كأس العالم (متوسط التهديف، إجمالي الأهداف، المباريات) في `WorldCupHubClient`
-
-### 2026-07-09 — Hotfix 2: تصحيح الـ Middleware (Next.js 16.2.10)
-- ✅ إعادة تسمية `middleware.ts` إلى `proxy.ts` وتصدير الدالة باسم `proxy` (تغيير إجباري في إصدار Next.js الجديد، حيث تم الاستغناء عن `middleware.ts` تماماً).
-- ✅ هذه الخطوة أصلحت مشكلة الفشل في Vercel (Build Error) مع الاحتفاظ بحماية لوحة التحكم.
-
-### 2026-07-09 — Hotfix 1: الإصلاحات الأمنية
-- ✅ إصلاح ثغرات SQL Injection في معلمات الاستعلام بصفحات اللاعبين والفرق
-- ✅ إصلاح حالة EventCompleted في الـ Schema.org للمباريات المنتهية
-- ✅ تصحيح أخطاء الـ CSS Variables للـ World Cup ورفع الحجب عن الـ Next.js Portal
-
-### 2026-07-09 — التسليم النهائي (Production Ready)
-- ✅ Production Build ناجح بدون أخطاء (Next.js 16.2.10 + Turbopack — 9 ثواني)
-- ✅ ESLint نظيف بالكامل: صفر أخطاء + صفر تحذيرات (30 ملف TypeScript)
-- ✅ 180/180 اختبار E2E ناجح (Chromium + Firefox + WebKit)
-- ✅ تقرير التسليم النهائي (walkthrough.md) — يغطي كل التفاصيل
-- ✅ 29 صفحة (ثابتة + ديناميكية) مع SEO كامل (JSON-LD, OG, Twitter Cards, Sitemap)
-- ✅ 7 API Routes محمية (Admin JWT + Cron Jobs)
-- ✅ نظام مباريات مباشرة مع Supabase Realtime
-- ✅ حماية XSS بـ DOMPurify + JWT Auth للوحة التحكم
-- ✅ Design System احترافي Dark Mode (TailwindCSS v4 + RTL)
-- ✅ المشروع جاهز للنشر على Vercel (Hobby Plan مجاني)
-
-### 2026-07-08 — V3 Refactor & Final Kimi Fixes
-- ✅ تم تنفيذ مراجعات DeepSeek بالكامل (Security, SEO, Cron Jobs).
-- ✅ تم تنفيذ مراجعات Kimi لسد ثغرات الـ SEO المتبقية وإصلاح مشاكل التوقيت وتحديث الـ Realtime.
-- ✅ تم تأمين الـ JWT Token لمنع الدخول العشوائي للوحة التحكم.
-- ✅ تم تطهير حقل الأخبار من هجمات XSS باستخدام DOMPurify.
-- ✅ تم معالجة مشاكل الوقت (Timezone) في واجهة المباريات.
-- ✅ تم إضافة JSON-LD و metadata قوية للـ SEO.
-- ✅ تم تحسين الـ components مثل MatchCard لاستيعاب كل الحالات.
-
-### 2026-07-07 — بداية المشروع
-- ✅ تم تحليل الموقع المنافس (yallasootlive.com) بالكامل
-- ✅ تم تحديد نقاط الضعف (14 نقطة) في الموقع المنافس
-- ✅ تم البحث عن حدود الباقات المجانية (Vercel, Firebase, Cloudinary)
-- ✅ تم البحث عن متطلبات ظهور اللوجو والاسم في بحث جوجل
-- ✅ تم البحث عن أفضل ممارسات أمان API Routes
-- ✅ تم البحث عن تكامل Next.js مع Firebase
-- 🔄 جاري إعداد خطة التنفيذ الشاملة
-- ⏳ في انتظار موافقة نادر على الخطة
-
----
-
-## 🔑 قرارات مهمة تم اتخاذها
-
-1. **Firebase بدل Supabase** — قرار نادر. Firebase Spark مجاني بالكامل بدون كريديت كارد
-2. **كل شيء مجاني** — لا توجد ميزانية. كل الخدمات على الباقات المجانية
-3. **الـ Agent يتحكم عبر API Routes** — محمية بـ API Key + Rate Limiting
-4. **التخطيط أولاً** — لا تنفيذ قبل اكتمال الخطة وموافقة نادر
-5. **الرفع (Deployment):** تم الاستقرار على رفع الموقع على **Vercel** لسهولة الرفع وتوافقه التام مع Next.js و API Routes والـ Cron Jobs، بدلاً من Cloudflare Pages التي تتطلب بيئة Edge Runtime المعقدة.
-6. **قاعدة مستودع الأكواد (GitHub):** يُمنع منعاً باتاً رفع أي ملفات وهمية، سكريبتات اختبار (`*.js`, `*.py`)، أو ملفات الـ Agents المؤقتة ومجلدات `scratch` إلى GitHub. يجب أن يكون الرفع نظيفاً ومقتصراً على أكواد المشروع الضرورية فقط.
-
----
-
-## 🚫 ملاحظات وتحذيرات
-
-- **فولدر `test` على الديسك توب:** ممنوع منعاً باتاً أخذ نسخة كاملة من مجلد المشروع بداخله (Backup). هذا المجلد مخصص **فقط** لإنشاء ملف `txt` واحد يجمع الكود بالكامل (مثل `full_project_code.txt`) وإرساله لـ DeepSeek أو أي فريق ذكاء اصطناعي آخر للمراجعة.
-- الموقع المنافس مش بتاع نادر — احنا بنبني موقع جديد منافس
-- لا نسخ محتوى حرفياً من أي مصدر — إعادة صياغة دائماً
-- الصور: icons مجانية أو مصممة — لا سرقة صور
-- الـ API Keys لازم تكون في Environment Variables فقط
-- كل تعديل يُسجل هنا في الذاكرة
-
----
-
-## 📁 هيكل المشروع (سيُحدث بعد البدء)
+## 📁 هيكل المشروع
 
 ```
 yalla-shoot-new/
 ├── .agents/
-│   ├── AGENTS.md          ← قواعد المشروع
-│   └── MEMORY.md          ← هذا الملف (الذاكرة)
-├── app/                   ← Next.js App Router
-├── components/            ← React Components
-├── lib/                   ← Firebase config + utilities
-├── public/                ← Static files + favicon + logo
-└── ... (سيُحدث لاحقاً)
+│   ├── AGENTS.md              ← قواعد المشروع
+│   └── MEMORY.md              ← هذا الملف (الذاكرة)
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx         ← Layout رئيسي (SEO + Analytics + Structured Data)
+│   │   ├── page.tsx           ← الصفحة الرئيسية (المباريات)
+│   │   ├── not-found.tsx      ← صفحة 404 مخصصة
+│   │   ├── error.tsx          ← صفحة خطأ
+│   │   ├── robots.ts          ← ملف الزحف
+│   │   ├── sitemap.ts         ← خريطة الموقع الديناميكية
+│   │   ├── globals.css        ← Design System (CSS Variables)
+│   │   ├── icon.png           ← Favicon
+│   │   ├── apple-icon.png     ← Apple Touch Icon
+│   │   ├── opengraph-image.png← صورة OG
+│   │   ├── twitter-image.png  ← صورة Twitter
+│   │   ├── match/[slug]/      ← صفحة تفاصيل المباراة
+│   │   ├── news/              ← قائمة الأخبار (Paginated)
+│   │   ├── news/[slug]/       ← صفحة الخبر
+│   │   ├── about/             ← من نحن
+│   │   ├── contact/           ← اتصل بنا
+│   │   ├── privacy/           ← سياسة الخصوصية
+│   │   ├── terms/             ← الشروط والأحكام
+│   │   ├── admin/             ← لوحة التحكم (محمية بـ JWT)
+│   │   ├── rss.xml/           ← RSS Feed للأخبار
+│   │   └── api/               ← API Routes
+│   │       ├── admin/         ← إضافة مباريات/أخبار
+│   │       └── cron/          ← جلب مباريات/أخبار/ترتيب
+│   ├── components/
+│   │   ├── Header.tsx         ← الهيدر (Logo + Nav)
+│   │   ├── Footer.tsx         ← الفوتر (روابط + حقوق)
+│   │   ├── MatchCard.tsx      ← كارت المباراة
+│   │   ├── LiveMatchesList.tsx← قائمة المباريات (Realtime)
+│   │   ├── LiveScoreTicker.tsx← شريط الأخبار العلوي
+│   │   ├── LiveScoreBanner.tsx← بانر النتائج المباشرة
+│   │   └── TeamLogo.tsx       ← شعار الفريق (Fallback SVG)
+│   ├── lib/
+│   │   ├── supabase.ts        ← Supabase Client
+│   │   └── translations.ts   ← ترجمة أسماء الفرق والبطولات
+│   └── types/
+│       └── database.ts        ← TypeScript Types
+├── e2e/                       ← اختبارات Playwright E2E
+├── supabase/
+│   └── schema.sql             ← مخطط قاعدة البيانات
+├── public/
+│   ├── icon-192.png           ← أيقونة 192px
+│   ├── icon-512.png           ← أيقونة 512px
+│   └── manifest.json          ← PWA Manifest
+├── scripts/
+│   └── generate-icons.js      ← سكريبت توليد الأيقونات
+├── next.config.ts             ← إعدادات Next.js (Security Headers + Images)
+├── playwright.config.ts       ← إعدادات Playwright
+├── eslint.config.mjs          ← إعدادات ESLint
+└── package.json
 ```
 
-## سجل مشاكل وحلول الأوركيستريتور (Orchestrator Knowledge Base)
-تم بناء وتحديث نظام الأوركيستريتور للتواصل مع الفريق (ChatGPT, Claude, Kimi, DeepSeek) وتم حل المشاكل التالية:
-1. **التعليق اللانهائي مع Kimi (Thinking):** 
-   - المشكلة: مؤشر 	hinking-container يظل بالصفحة بعد انتهاء الرد، مما يوهم الكود أن التوليد مستمر.
-   - الحل: تعديل is_generating_eval لكيمي ليعتمد فقط على زر الإيقاف (Stop Button) وعدم فحص عناصر الـ loading.
-2. **عدم استقرار النص (Timeout Fallback & Normalization):**
-   - المشكلة: مؤشرات الكتابة (Cursors) تجعل النص يتغير كل ثانية، فلا نصل للاستقرار (15 ثانية).
-   - الحل: استخدام Text Normalization (تجاهل المسافات الفارغة). وإضافة مهلة قصوى (Max Timeout 300s) بحيث إذا لم يستقر يعطي Error بدلاً من التعليق للأبد.
-3. **انهيار الأوركيستريتور كـ Background Task:**
-   - المشكلة: إغلاق المهمة المؤقتة كان يغلق الأوركيستريتور معه.
-   - الحل: تشغيله كـ Detached Daemon مستقل creationflags=subprocess.CREATE_NEW_CONSOLE.
-4. **تشفير BOM عبر PowerShell:**
-   - المشكلة: كتابة الكود بـ PowerShell تضيف UTF-8 BOM وتسبب SyntaxError في Python.
-   - الحل: استخدام Python لكتابة الملفات (أو أدوات العميل الأصلية) لضمان التشفير النظيف.
-5. **إرسال المسار بدلاً من النص:**
-   - المشكلة: client.py قد يعجز عن قراءة مسار الملف إذا لم يكن Absolute، فيرسل المسار كنص.
-   - الحل: التمرير المباشر للنص إذا كان قصيراً، أو التأكد من إرسال المسار المطلق بشكل لا غبار عليه.
+---
+
+## 🔐 الأمان
+
+- **API Keys:** كلها في Environment Variables (`.env.local`) — ممنوع `NEXT_PUBLIC_` لأي مفتاح سري
+- **Admin Auth:** JWT Token — لوحة التحكم محمية
+- **XSS Protection:** sanitize-html لمحتوى الأخبار
+- **SQL Injection:** استعلامات `.eq()` بدل `.or()` مع interpolation
+- **Security Headers:** HSTS + X-Frame-Options + X-Content-Type-Options + Referrer-Policy
+- **Rate Limiting:** ممنوع استخدام API بدون حماية
+
+---
+
+## 🔍 السيو (SEO) — الحالة الحالية
+
+| العنصر | الحالة |
+|--------|--------|
+| Title Template | `%s \| يلا شوت نيو` — كل صفحة فيها اسم الموقع |
+| Keywords | 26 كلمة مفتاحية في الصفحة الرئيسية + keywords خاصة لكل صفحة |
+| Structured Data | Organization + WebSite + SportsEvent + NewsArticle + BreadcrumbList |
+| Open Graph | موجود في كل صفحة |
+| Twitter Cards | summary_large_image |
+| Canonical URLs | موجود في كل صفحة |
+| Sitemap | ديناميكي — كل المباريات والأخبار |
+| Robots | يسمح بالزحف — يمنع /admin/ و /api/ |
+| RSS Feed | /rss.xml — آخر 20 خبر |
+| Google Verification | مفعّل |
+| application-name | "يلا شوت نيو" — لظهور الاسم في جوجل |
+| category | sports |
+
+---
+
+## ⚠️ قرارات مهمة
+
+1. **Supabase بدل Firebase** — المشروع يستخدم Supabase PostgreSQL مع Realtime
+2. **proxy.ts بدل middleware.ts** — Next.js 16.2.10 يستخدم `proxy.ts` حصرياً. **ممنوع** إعادة تسميته لـ `middleware.ts`
+3. **كل شيء مجاني** — لا ميزانية. كل الخدمات على باقات مجانية بدون كريديت كارد
+4. **الـ slug عربي** — روابط المباريات بالعربي بدل UUID
+5. **Dark Mode أولاً** — التصميم مبني على Dark Mode كأساس
+
+---
+
+## 🚫 ممنوعات
+
+- ممنوع إعادة تسمية `proxy.ts` لـ `middleware.ts`
+- ممنوع استخدام خدمات مدفوعة
+- ممنوع رفع ملفات مؤقتة أو سكريبتات اختبار على GitHub
+- ممنوع نسخ محتوى حرفياً من أي مصدر
+- ممنوع تعديل `.env.local` بدون إذن المالك
+
+---
+
+## 📊 الأوامر المهمة
+
+```bash
+npm run dev          # تشغيل السيرفر محلياً
+npm run build        # بناء المشروع للإنتاج
+npm run lint         # فحص ESLint
+npx playwright test  # تشغيل اختبارات E2E
+```
