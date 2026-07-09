@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const { data: match } = await query.single();
 
-  if (!match) return { title: "مباراة غير موجودة | يلا شوت نيو" };
+  if (!match) return { title: "مباراة غير موجودة" };
 
   const matchData = match as unknown as MatchWithTeams;
   const home = translateName(matchData.home_team?.name || "");
@@ -62,15 +62,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   
   if (matchData.status === "FINISHED" && matchData.home_score !== null && matchData.away_score !== null) {
     const score = `${matchData.home_score}-${matchData.away_score}`;
-    title = `${home} ${matchData.home_score}-${matchData.away_score} ${away} — ${league} | يلا شوت نيو`;
+    title = `${home} ${matchData.home_score}-${matchData.away_score} ${away} — ${league}`;
     description = `🔴 نتيجة مباراة ${home} ضد ${away} في ${league}: ${home} ${score} ${away}. ملخص وأهداف وأحداث المباراة الكاملة.`;
     ogTitle = `${home} ${score} ${away} | ${league}`;
   } else if (matchData.status === "IN_PLAY" || matchData.status === "LIVE") {
-    title = `🟢 ${home} ضد ${away} — ${league} (مباشر الآن) | يلا شوت نيو`;
+    title = `🟢 ${home} ضد ${away} — ${league} (مباشر الآن)`;
     description = `مشاهدة مباراة ${home} ضد ${away} في ${league} بث مباشر. أحداث المباراة لحظة بلحظة وتغطية حصرية.`;
     ogTitle = `🟢 ${home} ضد ${away} — ${league} (مباشر)`;
   } else {
-    title = `مباراة ${home} ضد ${away} — ${league} | يلا شوت نيو`;
+    title = `مباراة ${home} ضد ${away} — ${league}`;
     description = `موعد مباراة ${home} ضد ${away} في بطولة ${league}، القنوات الناقلة، البث المباشر والتشكيل المتوقع.`;
     ogTitle = `مباراة ${home} ضد ${away} — ${league}`;
   }
