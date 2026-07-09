@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       type: "article",
       publishedTime: news.published_at,
       modifiedTime: news.updated_at || news.published_at,
-      images: news.image_url ? [{ url: news.image_url, width: 1200, height: 630, alt: news.title }] : [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+      images: news.image_url ? [{ url: news.image_url, width: 1200, height: 630, alt: news.title }] : [{ url: `${baseUrl}/icon-512.png`, width: 512, height: 512, alt: 'يلا شوت نيو' }],
       locale: "ar_AR",
       siteName: "يلا شوت نيو",
       authors: ["يلا شوت نيو"],

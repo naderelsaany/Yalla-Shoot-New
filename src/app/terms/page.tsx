@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو. تعرف على حقوقك وواجباتك.',
     url: `${baseUrl}/terms`,
     type: 'website',
-    images: [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+    images: [{ url: `${baseUrl}/icon-512.png`, width: 512, height: 512, alt: 'يلا شوت نيو' }],
   },
   twitter: {
     card: 'summary_large_image',

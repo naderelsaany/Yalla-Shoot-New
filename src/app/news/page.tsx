@@ -29,7 +29,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       description: pageDesc,
       url: canonicalUrl,
       type: 'website',
-      images: [{ url: `${baseUrl}/icon-192.png`, width: 192, height: 192, alt: 'يلا شوت نيو' }],
+      images: [{ url: `${baseUrl}/icon-512.png`, width: 512, height: 512, alt: 'يلا شوت نيو' }],
     },
     twitter: {
       card: 'summary_large_image',

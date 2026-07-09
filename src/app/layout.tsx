@@ -100,9 +100,9 @@ function StructuredData() {
         url: baseUrl,
         logo: {
           "@type": "ImageObject",
-          url: `${baseUrl}/icon-192.png`,
-          width: 192,
-          height: 192,
+          url: `${baseUrl}/icon-512.png`,
+          width: 512,
+          height: 512,
           caption: "يلا شوت نيو",
         },
         sameAs: [
