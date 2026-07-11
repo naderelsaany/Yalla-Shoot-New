@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { supabase } from '@/lib/supabase';
 import { translateName } from '@/lib/translations';
+import { MatchWithTeams } from '@/types/database';
 
 export const alt = 'يلا شوت نيو - تفاصيل المباراة';
 export const size = { width: 1200, height: 630 };
@@ -29,7 +30,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     query = query.eq("slug", decodedSlug);
   }
 
-  const { data: match } = await query.single();
+  const { data: matchData } = await query.single();
+  const match = matchData as unknown as MatchWithTeams | null;
 
   if (!match) {
     return new ImageResponse(
