@@ -72,6 +72,8 @@ import { News } from "@/types/database";
 
 function NewsArticleStructuredData({ news }: { news: News }) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+  const plainDescription = (news.content || "").replace(/<[^>]+>/g, '').substring(0, 200).trim() + "...";
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -81,26 +83,66 @@ function NewsArticleStructuredData({ news }: { news: News }) {
     dateModified: news.updated_at || news.published_at,
     author: {
       "@type": "Organization",
-      name: "يلا شوت نيو",
-      url: baseUrl,
+      name: "فريق تحرير يلا شوت نيو",
+      url: `${baseUrl}/about`,
     },
     publisher: {
       "@type": "Organization",
       name: "يلا شوت نيو",
+      url: baseUrl,
       logo: {
         "@type": "ImageObject",
         url: `${baseUrl}/icon-192.png`,
         width: 192,
         height: 192
       },
+      sameAs: [
+        "https://www.facebook.com/yallashootnew",
+        "https://twitter.com/yallashootnew"
+      ]
     },
-    description: news.content?.substring(0, 200),
+    description: plainDescription,
     url: `${baseUrl}/news/${news.slug}`,
     inLanguage: "ar",
+    isAccessibleForFree: true,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `${baseUrl}/news/${news.slug}`,
     },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
+
+function BreadcrumbStructuredData({ newsTitle }: { newsTitle: string }) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "الرئيسية",
+        item: baseUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "الأخبار",
+        item: `${baseUrl}/news`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: newsTitle,
+      },
+    ],
   };
 
   return (
@@ -144,6 +186,7 @@ export default async function NewsDetailsPage({ params }: { params: Promise<{ sl
   return (
     <div className="container mx-auto px-4 py-8 flex-1 max-w-4xl">
       <NewsArticleStructuredData news={news} />
+      <BreadcrumbStructuredData newsTitle={news.title || ""} />
 
       <nav aria-label="breadcrumb" className="text-sm font-tajawal text-[var(--color-text-muted)] mb-6 flex items-center gap-2">
         <Link href="/" className="hover:text-[var(--color-accent)]">الرئيسية</Link>

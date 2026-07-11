@@ -339,19 +339,31 @@ export default async function MatchDetailsPage({ params }: { params: Promise<{ s
       </nav>
 
       <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-3xl p-6 md:p-10 shadow-[var(--shadow-elevated)] relative overflow-hidden mb-8">
-        <h1 className="text-xl md:text-3xl font-bold font-arabic text-center text-[var(--color-text-primary)] mb-2">
+        <h1 className="text-xl md:text-3xl font-bold font-arabic text-center text-[var(--color-text-primary)] mb-4">
           {match.status === "FINISHED" 
             ? `${homeName} ${match.home_score}-${match.away_score} ${awayName}`
             : `${homeName} ضد ${awayName}`
           }
         </h1>
+
+        {/* AI-Optimized Citability Block */}
+        <p className="text-sm md:text-base text-[var(--color-text-secondary)] font-tajawal text-center max-w-2xl mx-auto mb-6 leading-relaxed">
+          {match.status === "FINISHED" 
+            ? `انتهت مباراة ${homeName} ضد ${awayName} في بطولة ${leagueName} بنتيجة ${match.home_score}-${match.away_score}. أقيمت المباراة يوم ${dateString} وتمثل مواجهة هامة ضمن منافسات الموسم الحالي.`
+            : `مباراة ${homeName} ضد ${awayName} ضمن منافسات بطولة ${leagueName}. تقام المباراة المرتقبة يوم ${dateString} في تمام الساعة ${timeString} بتوقيت القاهرة.`
+          }
+        </p>
+
         <div className="text-center mb-6">
-          <p className="text-[var(--color-text-secondary)] font-tajawal text-sm">{leagueName}</p>
-          <p className="text-[var(--color-text-secondary)] font-tajawal mt-1">{dateString} • {timeString}</p>
+          <p className="text-[var(--color-text-secondary)] font-tajawal text-sm font-bold bg-[var(--color-bg-elevated)] inline-block px-4 py-1.5 rounded-full border border-[var(--color-border-subtle)]">
+            {leagueName} • {timeString}
+          </p>
           {match.status === "FINISHED" && (
-            <p className="text-sm font-bold text-[var(--color-text-secondary)] mt-2 bg-[var(--color-bg-elevated)] px-3 py-1 rounded-full border border-[var(--color-border-subtle)] inline-block">
-              نهاية المباراة
-            </p>
+            <div className="mt-3">
+              <span className="text-sm font-bold text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)] px-3 py-1 rounded-full border border-[var(--color-border-subtle)] inline-block">
+                نهاية المباراة
+              </span>
+            </div>
           )}
         </div>
 
