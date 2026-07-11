@@ -84,7 +84,7 @@ function HomeStructuredData({ matches }: { matches: MatchWithTeams[] }) {
   );
 }
 
-const getRecentTime = () => new Date(Date.now() - 14 * 60 * 60 * 1000);
+const getRecentTime = () => new Date(Date.now() - 48 * 60 * 60 * 1000);
 
 export default async function Home() {
   // Fetch recent and upcoming matches (starting from 14 hours ago to cover today's finished matches)
