@@ -35,7 +35,7 @@ export default function TeamLogo({ src, alt, size = "md", priority = false }: Te
     >
       {isPlaceholder ? (
         <svg
-          className="w-[60%] h-[60%] text-[var(--color-text-muted)]"
+          className="w-[65%] h-[65%] text-[var(--color-text-muted)]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -44,8 +44,9 @@ export default function TeamLogo({ src, alt, size = "md", priority = false }: Te
           strokeLinejoin="round"
         >
           <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v12" />
-          <path d="M6 12h12" />
+          <path d="M12 1v22" />
+          <path d="M1 12h22" />
+          <circle cx="12" cy="12" r="4" fill="currentColor" fillOpacity="0.2" />
         </svg>
       ) : (
         <Image
