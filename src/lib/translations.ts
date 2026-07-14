@@ -46,6 +46,11 @@ export const translateName = (englishName: string): string => {
     'Saudi Pro League': 'الدوري السعودي',
     'CAF Champions League': 'دوري أبطال أفريقيا',
     'AFC Champions League': 'دوري أبطال آسيا',
+    // Placeholder teams for unplayed knockout matches
+    'L101': 'خاسر نصف النهائي الأول',
+    'L102': 'خاسر نصف النهائي الثاني',
+    'W101': 'فائز نصف النهائي الأول',
+    'W102': 'فائز نصف النهائي الثاني',
   };
   return dictionary[englishName] || englishName;
 };
