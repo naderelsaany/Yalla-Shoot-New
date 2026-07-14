@@ -61,7 +61,6 @@ export async function GET(request: Request) {
     // Calculate standings for each team
     // Points: win=3, draw=1, loss=0
     interface TeamStanding {
-      team_name: string;
       team_id: string;
       played: number;
       won: number;
@@ -81,11 +80,9 @@ export async function GET(request: Request) {
       .select('id, name, logo_url');
 
     const teamNames: Record<string, string> = {};
-    const teamLogos: Record<string, string | null> = {};
     if (allTeams) {
       for (const t of allTeams) {
         teamNames[t.id] = t.name;
-        teamLogos[t.id] = t.logo_url;
       }
     }
 
@@ -101,7 +98,6 @@ export async function GET(request: Request) {
       for (const [id, isHome] of [[homeId, true], [awayId, false]] as const) {
         if (!teamStats[id]) {
           teamStats[id] = {
-            team_name: teamNames[id] || 'Unknown',
             team_id: id,
             played: 0,
             won: 0,
@@ -161,7 +157,6 @@ export async function GET(request: Request) {
     const standingsRows = sorted.map((team, index) => ({
       league_id: league.id,
       team_id: team.team_id,
-      team_name: team.team_name,
       position: index + 1,
       played: team.played,
       won: team.won,
@@ -171,7 +166,6 @@ export async function GET(request: Request) {
       goals_against: team.goals_against,
       goal_difference: team.goal_difference,
       points: team.points,
-      form: '',
     }));
 
     const { error: insertError } = await supabase
@@ -189,7 +183,6 @@ export async function GET(request: Request) {
       success: true,
       message: 'Standings calculated from match data. ' + sorted.length + ' teams in standings.',
       teams: sorted.length,
-      sample: sorted.slice(0, 3).map(t => t.team_name + ': ' + t.points + 'pts'),
     });
   } catch (error) {
     console.error('Standings Cron Error:', error);
