@@ -115,8 +115,7 @@ export default async function TeamsPage() {
                     className="p-3 bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-xl hover:shadow-[var(--shadow-elevated)] hover:-translate-y-0.5 transition-all text-center">
                 {team.logo_url ? (
                   <img src={team.logo_url} alt={team.name} 
-                       className="w-12 h-12 object-contain mx-auto mb-2" 
-                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                       className="w-12 h-12 object-contain mx-auto mb-2" />
                 ) : (
                   <div className="w-12 h-12 mx-auto mb-2 bg-[var(--color-bg-elevated)] rounded-full flex items-center justify-center text-lg font-bold text-[var(--color-text-muted)]">
                     {team.name.charAt(0)}

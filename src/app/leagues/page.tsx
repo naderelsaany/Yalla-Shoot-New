@@ -58,8 +58,7 @@ export default async function LeaguesPage() {
             <div className="flex items-center gap-4">
               {league.logo_url ? (
                 <img src={league.logo_url} alt={league.name} 
-                     className="w-14 h-14 object-contain rounded-xl bg-white/5 p-2"
-                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                     className="w-14 h-14 object-contain rounded-xl bg-white/5 p-2" />
               ) : (
                 <div className="w-14 h-14 bg-[var(--color-bg-elevated)] rounded-xl flex items-center justify-center text-2xl">
                   🏆
