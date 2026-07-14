@@ -114,7 +114,7 @@ export default async function TeamsPage() {
             {grouped[key].map(team => (
               <Link key={team.id} href={`/team/${generateSlug(team.name)}`} 
                     className="p-3 bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] rounded-xl hover:shadow-[var(--shadow-elevated)] hover:-translate-y-0.5 transition-all text-center">
-                <TeamImage src={team.logo_url} name={team.name} />
+                <TeamImage src={team.logo_url ?? null} name={team.name} />
                 <h3 className="text-sm font-bold font-tajawal text-[var(--color-text-primary)] truncate">{team.name}</h3>
               </Link>
             ))}
