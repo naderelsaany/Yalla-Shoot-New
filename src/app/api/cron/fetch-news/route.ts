@@ -11,8 +11,11 @@ const RSS_FEEDS = [
 
 export async function GET(request: Request) {
   try {
+    // Accept either CRON_SECRET Bearer token OR Vercel Cron internal header
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const isVercelCron = request.headers.get('x-vercel-cron') === '1';
+    const isValidAuth = authHeader === `Bearer ${process.env.CRON_SECRET}` || isVercelCron;
+    if (!isValidAuth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

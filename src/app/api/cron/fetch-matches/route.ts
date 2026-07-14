@@ -61,10 +61,17 @@ interface ApiResponse {
   };
 }
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function GET(request: Request) {
   try {
+    // Accept either CRON_SECRET Bearer token OR Vercel Cron internal header
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const isVercelCron = request.headers.get('x-vercel-cron') === '1';
+    const isValidAuth = authHeader === `Bearer ${process.env.CRON_SECRET}` || isVercelCron;
+    if (!isValidAuth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -72,191 +79,187 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'RAPIDAPI_KEY not configured' }, { status: 500 });
     }
 
-    // 1. Fetch matches from yesterday to tomorrow (date range for filtering)
-    const yesterdayDate = new Date();
-    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    const yesterday = yesterdayDate.toISOString().split('T')[0];
+    // Fetch ALL matches from the World Cup across all pages
+    // This backfills all 104 matches and keeps the DB up to date
+    const allMatches: ApiMatch[] = [];
+    let currentPage = 1;
+    let totalPages = 1;
 
-    const tomorrowDate = new Date();
-    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-    const tomorrow = tomorrowDate.toISOString().split('T')[0];
+    do {
+      const url = `https://${RAPIDAPI_HOST}/competition/${COMPETITION_ID}/matches?order=desc&page=${currentPage}`;
+      
+      const res = await fetch(url, {
+        headers: {
+          'x-rapidapi-key': RAPIDAPI_KEY!,
+          'x-rapidapi-host': RAPIDAPI_HOST,
+          'Content-Type': 'application/json',
+        },
+      });
 
-    // Fetch all World Cup matches from api-football186 (sorted by newest first)
-    const url = `https://${RAPIDAPI_HOST}/competition/${COMPETITION_ID}/matches?order=desc`;
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`api-football186 page ${currentPage} error:`, errorText);
+        // If a page fails, stop fetching more
+        break;
+      }
 
-    const res = await fetch(url, {
-      headers: {
-        'x-rapidapi-key': RAPIDAPI_KEY,
-        'x-rapidapi-host': RAPIDAPI_HOST,
-        'Content-Type': 'application/json',
-      },
-      next: { revalidate: 0 },
-    });
+      const data: ApiResponse = await res.json();
+      if (data.status !== 'ok') break;
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('api-football186 error:', errorText);
-      return NextResponse.json({ error: 'Failed to fetch from api-football186' }, { status: res.status });
-    }
+      const items = data.response?.items || [];
+      allMatches.push(...items);
 
-    const data: ApiResponse = await res.json();
-    if (data.status !== 'ok') {
-      return NextResponse.json({ error: 'API returned non-ok status' }, { status: 500 });
-    }
+      totalPages = data.response?.total_pages || 1;
+      currentPage++;
 
-    const allMatches = data.response.items || [];
+      // Rate-limit between pages
+      if (currentPage <= totalPages) {
+        await sleep(300);
+      }
+    } while (currentPage <= totalPages);
+
     const supabase = getServiceSupabase();
-
-    // Filter matches within our date range (yesterday to tomorrow)
-    const relevantMatches = allMatches.filter((match) => {
-      const matchDate = match.datestart.substring(0, 10);
-      return matchDate >= yesterday && matchDate <= tomorrow;
-    });
-
-    // If no matches in the date range, try to fetch more pages
-    // For now, process what we have since the most recent matches are in the first page with order=desc
-
     let processedMatches = 0;
     let insertedMatches = 0;
+    let updatedMatches = 0;
+    let errors = 0;
 
-    for (const match of relevantMatches) {
-      // Source of truth from the API
-      const competitionName = match.competition?.cname || 'FIFA World Cup';
-      const homeTeamInfo = match.teams.home;
-      const awayTeamInfo = match.teams.away;
+    for (const match of allMatches) {
+      try {
+        const competitionName = match.competition?.cname || 'FIFA World Cup';
+        const homeTeamInfo = match.teams.home;
+        const awayTeamInfo = match.teams.away;
 
-      // Map status from API format to our format
-      let status: string;
-      switch (match.status_str) {
-        case 'result':
-          status = 'FINISHED';
-          break;
-        case 'live':
-          status = 'IN_PLAY';
-          break;
-        case 'upcoming':
-          status = 'SCHEDULED';
-          break;
-        default:
-          status = 'SCHEDULED';
-      }
+        // Map status
+        let status: string;
+        switch (match.status_str) {
+          case 'result': status = 'FINISHED'; break;
+          case 'live':    status = 'IN_PLAY'; break;
+          case 'upcoming':status = 'SCHEDULED'; break;
+          default:        status = 'SCHEDULED';
+        }
 
-      // Map scores
-      const homeScore = match.periods?.ft?.home ?? (match.result.home ? parseInt(match.result.home) : null);
-      const awayScore = match.periods?.ft?.away ?? (match.result.away ? parseInt(match.result.away) : null);
+        // Map scores
+        const homeScore = match.periods?.ft?.home ?? (match.result.home ? parseInt(match.result.home) : null);
+        const awayScore = match.periods?.ft?.away ?? (match.result.away ? parseInt(match.result.away) : null);
 
-      // 2. Find or create League (competition)
-      let { data: league } = await supabase
-        .from('leagues')
-        .select('id')
-        .eq('name', competitionName)
-        .maybeSingle();
-
-      if (!league) {
-        const { data: newLeague, error } = await supabase
+        // 1. League
+        let { data: league } = await supabase
           .from('leagues')
-          .insert({
-            name: competitionName,
-            logo_url: match.competition?.logo || null,
-            country: match.competition?.category || null,
-          })
           .select('id')
+          .eq('name', competitionName)
           .maybeSingle();
-        if (error) console.error('League insert error:', error);
-        league = newLeague;
-      }
 
-      if (!league) continue;
+        if (!league) {
+          const { data: newLeague } = await supabase
+            .from('leagues')
+            .insert({
+              name: competitionName,
+              logo_url: match.competition?.logo || null,
+              country: match.competition?.category || null,
+            })
+            .select('id')
+            .maybeSingle();
+          league = newLeague;
+        }
+        if (!league) { errors++; continue; }
 
-      // 3. Find or create Home Team
-      let { data: homeTeam } = await supabase
-        .from('teams')
-        .select('id')
-        .eq('name', homeTeamInfo.tname)
-        .maybeSingle();
-
-      if (!homeTeam) {
-        const { data: newTeam, error } = await supabase
+        // 2. Home Team
+        let { data: homeTeam } = await supabase
           .from('teams')
-          .insert({
-            name: homeTeamInfo.tname,
-            short_name: homeTeamInfo.abbr || null,
-            logo_url: homeTeamInfo.logo || null,
-          })
           .select('id')
+          .eq('name', homeTeamInfo.tname)
           .maybeSingle();
-        if (error) console.error('Home Team insert error:', error);
-        homeTeam = newTeam;
-      }
 
-      // 4. Find or create Away Team
-      let { data: awayTeam } = await supabase
-        .from('teams')
-        .select('id')
-        .eq('name', awayTeamInfo.tname)
-        .maybeSingle();
+        if (!homeTeam) {
+          const { data: newTeam } = await supabase
+            .from('teams')
+            .insert({
+              name: homeTeamInfo.tname,
+              short_name: homeTeamInfo.abbr || null,
+              logo_url: homeTeamInfo.logo || null,
+            })
+            .select('id')
+            .maybeSingle();
+          homeTeam = newTeam;
+        }
 
-      if (!awayTeam) {
-        const { data: newTeam, error } = await supabase
+        // 3. Away Team
+        let { data: awayTeam } = await supabase
           .from('teams')
-          .insert({
-            name: awayTeamInfo.tname,
-            short_name: awayTeamInfo.abbr || null,
-            logo_url: awayTeamInfo.logo || null,
-          })
           .select('id')
+          .eq('name', awayTeamInfo.tname)
           .maybeSingle();
-        if (error) console.error('Away Team insert error:', error);
-        awayTeam = newTeam;
+
+        if (!awayTeam) {
+          const { data: newTeam } = await supabase
+            .from('teams')
+            .insert({
+              name: awayTeamInfo.tname,
+              short_name: awayTeamInfo.abbr || null,
+              logo_url: awayTeamInfo.logo || null,
+            })
+            .select('id')
+            .maybeSingle();
+          awayTeam = newTeam;
+        }
+
+        if (!homeTeam || !awayTeam) { errors++; continue; }
+
+        const matchDateISO = match.datestart.replace(' ', 'T') + 'Z';
+
+        // Check if match exists
+        const { data: existingMatch } = await supabase
+          .from('matches')
+          .select('id')
+          .eq('home_team_id', homeTeam.id)
+          .eq('away_team_id', awayTeam.id)
+          .gte('match_date', matchDateISO.substring(0, 10) + 'T00:00:00Z')
+          .lte('match_date', matchDateISO.substring(0, 10) + 'T23:59:59Z')
+          .maybeSingle();
+
+        // Generate slug
+        const rawHome = translateName(homeTeamInfo.tname);
+        const rawAway = translateName(awayTeamInfo.tname);
+        const safeHome = rawHome.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
+        const safeAway = rawAway.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
+        const dateStr = matchDateISO.substring(0, 10);
+        const shortId = crypto.randomUUID().substring(0, 8);
+        const slug = `مباراة-${safeHome}-ضد-${safeAway}-${dateStr}-${shortId}`;
+
+        const matchPayload = {
+          league_id: league.id,
+          home_team_id: homeTeam.id,
+          away_team_id: awayTeam.id,
+          match_date: matchDateISO,
+          status: status,
+          home_score: homeScore,
+          away_score: awayScore,
+          slug: slug,
+        };
+
+        if (existingMatch) {
+          await supabase.from('matches').update(matchPayload).eq('id', existingMatch.id);
+          updatedMatches++;
+        } else {
+          await supabase.from('matches').insert(matchPayload);
+          insertedMatches++;
+        }
+        processedMatches++;
+      } catch (matchError) {
+        console.error('Error processing match:', matchError);
+        errors++;
       }
-
-      if (!homeTeam || !awayTeam) continue;
-
-      // Convert datestart to ISO format
-      const matchDateISO = match.datestart.replace(' ', 'T') + 'Z';
-
-      // 5. Upsert Match
-      const { data: existingMatch } = await supabase
-        .from('matches')
-        .select('id')
-        .eq('home_team_id', homeTeam.id)
-        .eq('away_team_id', awayTeam.id)
-        .gte('match_date', matchDateISO.substring(0, 10) + 'T00:00:00Z')
-        .lte('match_date', matchDateISO.substring(0, 10) + 'T23:59:59Z')
-        .maybeSingle();
-
-      // Generate slug
-      const rawHome = translateName(homeTeamInfo.tname);
-      const rawAway = translateName(awayTeamInfo.tname);
-      const safeHome = rawHome.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
-      const safeAway = rawAway.replace(/[^\w\u0600-\u06FF\s-]/g, '').replace(/\s+/g, '-');
-      const dateStr = matchDateISO.substring(0, 10);
-      const shortId = crypto.randomUUID().substring(0, 8);
-      const slug = `مباراة-${safeHome}-ضد-${safeAway}-${dateStr}-${shortId}`;
-
-      const matchPayload = {
-        league_id: league.id,
-        home_team_id: homeTeam.id,
-        away_team_id: awayTeam.id,
-        match_date: matchDateISO,
-        status: status,
-        home_score: homeScore,
-        away_score: awayScore,
-        slug: slug,
-      };
-
-      if (existingMatch) {
-        await supabase.from('matches').update(matchPayload).eq('id', existingMatch.id);
-      } else {
-        await supabase.from('matches').insert(matchPayload);
-        insertedMatches++;
-      }
-      processedMatches++;
     }
 
     return NextResponse.json({
       success: true,
-      message: `Fetched ${allMatches.length} matches. Filtered ${relevantMatches.length} in date range. Inserted ${insertedMatches} new, processed ${processedMatches} total.`,
+      message: [
+        `Fetched ${allMatches.length} matches (${Math.ceil(allMatches.length / 10)} pages).`,
+        `Processed ${processedMatches} total.`,
+        `Inserted ${insertedMatches} new, updated ${updatedMatches} existing.`,
+        errors ? `Errors: ${errors}.` : '',
+      ].filter(Boolean).join(' '),
     });
   } catch (error) {
     console.error('Cron Error:', error);
