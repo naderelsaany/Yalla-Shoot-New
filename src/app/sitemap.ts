@@ -4,12 +4,18 @@ import { Match, News } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 
+function generateSlug(name: string): string {
+  return name.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-');
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
 
   // Fetch dynamic routes
   const { data: matches } = await supabase.from('matches').select('id, slug, updated_at, created_at, match_date, status');
   const { data: news } = await supabase.from('news').select('slug, updated_at');
+  const { data: teams } = await supabase.from('teams').select('id, name, updated_at').limit(200);
+  const { data: leagues } = await supabase.from('leagues').select('id, name, updated_at').limit(30);
 
   const now = new Date();
   const weekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -28,7 +34,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFreq = 'weekly';
       priority = 0.6;
     } else {
-      // Upcoming match - if within a week, higher priority
       const matchDate = new Date(m.match_date || now);
       if (matchDate < weekLater) {
         changeFreq = 'daily';
@@ -50,7 +55,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const newsUrls = news?.map((n: Pick<News, 'slug' | 'updated_at'>) => {
     const newsDate = new Date(n.updated_at || now);
     const daysSinceUpdate = Math.floor((now.getTime() - newsDate.getTime()) / (1000 * 60 * 60 * 24));
-
     return {
       url: `${baseUrl}/news/${n.slug}`,
       lastModified: newsDate.toISOString(),
@@ -58,6 +62,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: daysSinceUpdate < 2 ? 0.8 : daysSinceUpdate < 7 ? 0.6 : 0.4,
     };
   }) || [];
+
+  const teamUrls: MetadataRoute.Sitemap = teams?.map(t => ({
+    url: `${baseUrl}/team/${generateSlug(t.name)}`,
+    lastModified: new Date(t.updated_at || now).toISOString(),
+    changeFrequency: 'daily' as const,
+    priority: 0.5,
+  })) || [];
+
+  const leagueUrls: MetadataRoute.Sitemap = leagues?.map(l => ({
+    url: `${baseUrl}/league/${generateSlug(l.name)}`,
+    lastModified: new Date(l.updated_at || now).toISOString(),
+    changeFrequency: 'daily' as const,
+    priority: 0.6,
+  })) || [];
 
   return [
     {
@@ -71,6 +89,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: 'hourly',
       priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/teams`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/leagues`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/about`,
@@ -98,5 +128,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...matchUrls,
     ...newsUrls,
+    ...teamUrls,
+    ...leagueUrls,
   ];
 }
