@@ -46,3 +46,6 @@ next-env.d.ts
 
 # temporary scripts
 bundle_code.py
+
+.vercel
+.env*
