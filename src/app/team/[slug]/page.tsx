@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const translatedName = translateName(team.name);
   return {
-    title: `${translatedName} — فريق | يلا شوت نيو`,
+    title: `${translatedName} — فريق`,
     description: `صفحة فريق ${translatedName} — مباريات الفريق، نتائج، مواعيد وإحصائيات على يلا شوت نيو.`,
     keywords: `${translatedName}, فريق ${translatedName}, مباريات ${translatedName}, نتائج ${translatedName}, ${translatedName} اليوم`,
     alternates: { canonical: `${baseUrl}/team/${decodedSlug}` },

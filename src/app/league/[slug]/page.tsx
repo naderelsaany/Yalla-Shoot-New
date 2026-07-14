@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const translatedName = translateName(league.name);
   return {
-    title: `${translatedName} — بطولة | يلا شوت نيو`,
+    title: `${translatedName} — بطولة`,
     description: `بطولة ${translatedName} على يلا شوت نيو — جدول المباريات، النتائج، الترتيب والإحصائيات.`,
     keywords: `${translatedName}, ${translatedName} 2026, نتائج ${translatedName}, مباريات ${translatedName}, ترتيب ${translatedName}`,
     alternates: { canonical: `${baseUrl}/league/${decodedSlug}` },

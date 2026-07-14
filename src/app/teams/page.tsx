@@ -8,7 +8,7 @@ export const revalidate = 3600; // ISR - every hour
 export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
   return {
-    title: 'الفرق الرياضية — يلا شوت نيو',
+    title: 'الفرق الرياضية',
     description: 'جميع الفرق الرياضية في يلا شوت نيو — منتخبات وأندية من جميع البطولات والدوريات العربية والعالمية.',
     keywords: 'فرق كرة القدم, منتخبات, أندية, يلا شوت نيو, كرة قدم عربية, فرق الدوري المصري, فرق الدوري السعودي',
     alternates: { canonical: `${baseUrl}/teams` },

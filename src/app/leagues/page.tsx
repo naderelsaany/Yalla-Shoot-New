@@ -8,7 +8,7 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
   return {
-    title: 'البطولات — يلا شوت نيو',
+    title: 'البطولات',
     description: 'جميع البطولات والدوريات على يلا شوت نيو — كأس العالم، الدوري المصري، الدوري السعودي، دوري أبطال أوروبا والمزيد.',
     keywords: 'بطولات كرة قدم, دوريات, يلا شوت نيو, كأس العالم, دوري أبطال أوروبا, الدوري المصري, الدوري السعودي',
     alternates: { canonical: `${baseUrl}/leagues` },
