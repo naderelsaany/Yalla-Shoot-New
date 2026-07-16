@@ -143,18 +143,31 @@ export async function GET(request: Request) {
         const homeScore = match.periods?.ft?.home ?? (match.result.home ? parseInt(match.result.home) : null);
         const awayScore = match.periods?.ft?.away ?? (match.result.away ? parseInt(match.result.away) : null);
 
-        // 1. League
+        // 1. League — Check Arabic name first, then English name
+        const arabicName = competitionName === 'FIFA World Cup' ? 'كأس العالم 2026' : competitionName;
         let { data: league } = await supabase
           .from('leagues')
           .select('id')
-          .eq('name', competitionName)
+          .eq('name', arabicName)
           .maybeSingle();
 
+        if (!league && arabicName !== competitionName) {
+          // Fallback: check English name too
+          const { data: engLeague } = await supabase
+            .from('leagues')
+            .select('id')
+            .eq('name', competitionName)
+            .maybeSingle();
+          league = engLeague;
+        }
+
         if (!league) {
+          // Create with Arabic name if available, otherwise English
+          const createName = arabicName;
           const { data: newLeague } = await supabase
             .from('leagues')
             .insert({
-              name: competitionName,
+              name: createName,
               logo_url: match.competition?.logo || null,
               country: match.competition?.category || null,
             })
