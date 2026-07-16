@@ -21,18 +21,28 @@ export async function GET(request: Request) {
 
     const supabase = getServiceSupabase();
 
-    // Get the FIFA World Cup league
+    // Get the FIFA World Cup league (Arabic name after merge)
     const { data: league } = await supabase
       .from('leagues')
       .select('id')
-      .eq('name', 'FIFA World Cup')
+      .eq('name', 'كأس العالم 2026')
       .maybeSingle();
 
     if (!league) {
-      return NextResponse.json({ 
-        success: false, 
-        message: 'FIFA World Cup league not found in database' 
-      });
+      // Fallback to English name (pre-merge)
+      const { data: engLeague } = await supabase
+        .from('leagues')
+        .select('id')
+        .eq('name', 'FIFA World Cup')
+        .maybeSingle();
+      
+      if (!engLeague) {
+        return NextResponse.json({ 
+          success: false, 
+          message: 'World Cup league not found in database' 
+        });
+      }
+      league = engLeague;
     }
 
     // Get all FINISHED matches for the World Cup
