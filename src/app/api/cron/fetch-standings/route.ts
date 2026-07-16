@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     const supabase = getServiceSupabase();
 
     // Get the FIFA World Cup league (Arabic name after merge)
-    const { data: league } = await supabase
+    let { data: league } = await supabase
       .from('leagues')
       .select('id')
       .eq('name', 'كأس العالم 2026')
