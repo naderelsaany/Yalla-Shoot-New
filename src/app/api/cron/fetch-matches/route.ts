@@ -79,44 +79,32 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'RAPIDAPI_KEY not configured' }, { status: 500 });
     }
 
-    // Fetch ALL matches from the World Cup across all pages
-    // This backfills all 104 matches and keeps the DB up to date
+    // Fetch matches from the World Cup — only page 1
+    // ⚠️ api-football186 has broken pagination: all pages return the same 10 matches
+    // Fetching multiple pages wastes time and hits Vercel Hobby's 10s timeout
+    // Page 1 contains all available upcoming/recent matches (the most important ones)
     const allMatches: ApiMatch[] = [];
-    let currentPage = 1;
-    let totalPages = 1;
 
-    do {
-      const url = `https://${RAPIDAPI_HOST}/competition/${COMPETITION_ID}/matches?order=desc&page=${currentPage}`;
-      
-      const res = await fetch(url, {
-        headers: {
-          'x-rapidapi-key': RAPIDAPI_KEY!,
-          'x-rapidapi-host': RAPIDAPI_HOST,
-          'Content-Type': 'application/json',
-        },
-      });
+    const url = `https://${RAPIDAPI_HOST}/competition/${COMPETITION_ID}/matches?order=desc&page=1`;
+    
+    const res = await fetch(url, {
+      headers: {
+        'x-rapidapi-key': RAPIDAPI_KEY!,
+        'x-rapidapi-host': RAPIDAPI_HOST,
+        'Content-Type': 'application/json',
+      },
+    });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error(`api-football186 page ${currentPage} error:`, errorText);
-        // If a page fails, stop fetching more
-        break;
-      }
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`api-football186 page 1 error:`, errorText);
+      return NextResponse.json({ error: `API error: ${res.status} ${errorText}` }, { status: 502 });
+    }
 
-      const data: ApiResponse = await res.json();
-      if (data.status !== 'ok') break;
-
-      const items = data.response?.items || [];
-      allMatches.push(...items);
-
-      totalPages = data.response?.total_pages || 1;
-      currentPage++;
-
-      // Rate-limit between pages
-      if (currentPage <= totalPages) {
-        await sleep(300);
-      }
-    } while (currentPage <= totalPages);
+    const data: ApiResponse = await res.json();
+    if (data.status === 'ok') {
+      allMatches.push(...(data.response?.items || []));
+    }
 
     const supabase = getServiceSupabase();
     let processedMatches = 0;
