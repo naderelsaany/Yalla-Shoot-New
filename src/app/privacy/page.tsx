@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'سياسة الخصوصية',
   description: 'سياسة الخصوصية لموقع يلا شوت نيو. تعرف على كيفية جمع واستخدام وحماية بياناتك الشخصية عند استخدام منصتنا الرياضية.',
   keywords: 'سياسة الخصوصية, سياسة يلا شوت نيو, الخصوصية, حماية البيانات, ملفات تعريف الارتباط, سياسة cookies, Yalla Shoot New privacy',
-  alternates: { canonical: '/privacy' },
+  alternates: { canonical: `${baseUrl}/privacy` },
   openGraph: {
     title: 'سياسة الخصوصية - يلا شوت نيو',
     description: 'تعرف على سياسة الخصوصية لموقع يلا شوت نيو وكيف نحمي بياناتك.',

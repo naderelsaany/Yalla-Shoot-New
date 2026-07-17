@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'الشروط والأحكام',
   description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو. تعرف على حقوقك وواجباتك عند استخدام منصتنا الرياضية للمباريات والأخبار.',
   keywords: 'الشروط والأحكام, شروط الاستخدام, يلا شوت نيو, سياسة الموقع, حقوق الملكية الفكرية, Yalla Shoot New terms',
-  alternates: { canonical: '/terms' },
+  alternates: { canonical: `${baseUrl}/terms` },
   openGraph: {
     title: 'الشروط والأحكام - يلا شوت نيو',
     description: 'الشروط والأحكام الخاصة باستخدام موقع يلا شوت نيو. تعرف على حقوقك وواجباتك.',

@@ -91,12 +91,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description,
     keywords: `${home} ضد ${away}, نتيجة مباراة ${home} و ${away}, ${resultKeywords}${league}, بث مباشر, يلا شوت نيو, مباريات اليوم, كرة قدم, كورة لايف`,
     alternates: {
-      canonical: `/match/${slug}`,
+      canonical: `${baseUrl}/match/${slug}`,
     },
     openGraph: {
       title: ogTitle,
       description,
-      url: `/match/${slug}`,
+      url: `${baseUrl}/match/${slug}`,
       type: "article",
       publishedTime: matchData.match_date,
       siteName: "يلا شوت نيو",

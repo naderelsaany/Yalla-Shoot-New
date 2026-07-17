@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "اتصل بنا",
   description: "تواصل مع فريق يلا شوت نيو لأي استفسارات أو اقتراحات أو للإبلاغ عن مشكلة في الموقع. فريق الدعم الفني في خدمتك على مدار الساعة.",
   keywords: "اتصل بنا, يلا شوت نيو, تواصل معنا, دعم فني, استفسارات, إعلانات, Yalla Shoot New contact",
-  alternates: { canonical: '/contact' },
+  alternates: { canonical: `${baseUrl}/contact` },
   openGraph: {
     title: "اتصل بنا - يلا شوت نيو",
     description: "تواصل مع فريق يلا شوت نيو لأي استفسارات أو اقتراحات.",
