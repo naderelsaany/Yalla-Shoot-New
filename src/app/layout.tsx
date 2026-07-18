@@ -47,6 +47,7 @@ export const metadata: Metadata = {
   publisher: "يلا شوت نيو",
   other: {
     'application-name': 'يلا شوت نيو',
+    'og:site_name': 'يلا شوت نيو',
   },
   robots: {
     index: true,
@@ -67,9 +68,6 @@ export const metadata: Metadata = {
       title: "يلا شوت نيو | Yalla Shoot New",
       description: "تابع مباريات اليوم بث مباشر وتغطية حصرية لبطولة كأس العالم.",
     },
-  other: {
-    'og:site_name': 'يلا شوت نيو',
-  },
   twitter: {
     card: "summary_large_image",
     title: "يلا شوت نيو | مباريات اليوم وكأس العالم",
