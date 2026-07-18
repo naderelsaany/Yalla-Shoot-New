@@ -144,7 +144,7 @@ export default function LiveScoreBanner() {
       <button
         onClick={handleClose}
         data-testid="close-banner"
-        className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--color-bg-primary)]"
+        className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors p-3 rounded-lg hover:bg-[var(--color-bg-primary)] min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label="إغلاق"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

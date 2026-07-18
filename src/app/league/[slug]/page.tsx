@@ -7,9 +7,7 @@ import Link from 'next/link';
 
 export const revalidate = 60;
 
-function generateSlug(name: string): string {
-  return name.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-');
-}
+import { generateSlug } from '@/lib/slug';
 
 export async function generateStaticParams() {
   const { data: leagues } = await supabase.from('leagues').select('name').limit(30);

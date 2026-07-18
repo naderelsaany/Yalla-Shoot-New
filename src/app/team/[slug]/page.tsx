@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { translateName } from '@/lib/translations';
+import { generateSlug } from '@/lib/slug';
 import TeamLogo from '@/components/TeamLogo';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -7,10 +8,6 @@ import Link from 'next/link';
 import { Match, Team } from '@/types/database';
 
 export const revalidate = 60;
-
-function generateSlug(name: string): string {
-  return name.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-');
-}
 
 export async function generateStaticParams() {
   const { data: teams } = await supabase.from('teams').select('name').limit(200);

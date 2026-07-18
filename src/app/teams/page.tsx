@@ -1,10 +1,11 @@
 import { supabase } from '@/lib/supabase';
 import { Team } from '@/types/database';
+import { generateSlug } from '@/lib/slug';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import TeamImage from './TeamImage';
 
-export const revalidate = 3600; // ISR - every hour
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
@@ -19,10 +20,6 @@ export async function generateMetadata(): Promise<Metadata> {
       url: `${baseUrl}/teams`,
     },
   };
-}
-
-function generateSlug(name: string): string {
-  return name.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-');
 }
 
 function TeamsBreadcrumbsStructuredData() {

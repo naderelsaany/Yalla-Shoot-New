@@ -1,12 +1,9 @@
 import { MetadataRoute } from 'next';
 import { supabase } from '@/lib/supabase';
+import { generateSlug } from '@/lib/slug';
 import { Match, News } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
-
-function generateSlug(name: string): string {
-  return name.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-');
-}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';

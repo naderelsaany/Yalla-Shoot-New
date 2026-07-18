@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { generateSlug } from '@/lib/slug';
 import { League } from '@/types/database';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -14,10 +15,6 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: `${baseUrl}/leagues` },
     openGraph: { title: 'البطولات | يلا شوت نيو', url: `${baseUrl}/leagues` },
   };
-}
-
-function generateSlug(name: string): string {
-  return name.replace(/[^a-zA-Z0-9\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-');
 }
 
 export default async function LeaguesPage() {

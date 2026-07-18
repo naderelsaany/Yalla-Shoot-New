@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     title: "يلا شوت نيو | بث مباشر مباريات اليوم بدون تقطيع",
     description: "أسرع تغطية لنتائج المباريات وأهم الأخبار الرياضية. تابع مباريات اليوم بث مباشر بجودة HD.",
     url: process.env.NEXT_PUBLIC_BASE_URL || "https://yalla-shoot-new.vercel.app",
+    siteName: "يلا شوت نيو",
+    locale: "ar_AR",
     type: "website",
     images: [{ url: "/icon-512.png", width: 512, height: 512, alt: "يلا شوت نيو" }],
   },

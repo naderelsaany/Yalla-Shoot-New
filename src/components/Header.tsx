@@ -23,11 +23,11 @@ export default function Header() {
         </Link>
 
         {/* Navigation - Scrollable on Mobile */}
-        <nav className="flex items-center gap-4 md:gap-8 font-tajawal text-[var(--color-text-secondary)] font-medium overflow-x-auto md:overflow-visible whitespace-nowrap no-scrollbar pr-4">
-          <Link href="/" className="hover:text-[var(--color-accent)] transition-colors">الرئيسية</Link>
-          <Link href="/news" className="hover:text-[var(--color-accent)] transition-colors">الأخبار</Link>
-          <Link href="/teams" className="hover:text-[var(--color-accent)] transition-colors">الفرق</Link>
-          <Link href="/leagues" className="hover:text-[var(--color-accent)] transition-colors">البطولات</Link>
+        <nav className="flex items-center gap-2 md:gap-8 font-tajawal text-[var(--color-text-secondary)] font-medium overflow-x-auto md:overflow-visible whitespace-nowrap no-scrollbar pr-4">
+          <Link href="/" className="px-3 py-2 rounded-lg hover:text-[var(--color-accent)] hover:bg-[var(--color-bg-card)] transition-all">الرئيسية</Link>
+          <Link href="/news" className="px-3 py-2 rounded-lg hover:text-[var(--color-accent)] hover:bg-[var(--color-bg-card)] transition-all">الأخبار</Link>
+          <Link href="/teams" className="px-3 py-2 rounded-lg hover:text-[var(--color-accent)] hover:bg-[var(--color-bg-card)] transition-all">الفرق</Link>
+          <Link href="/leagues" className="px-3 py-2 rounded-lg hover:text-[var(--color-accent)] hover:bg-[var(--color-bg-card)] transition-all">البطولات</Link>
         </nav>
       </div>
     </header>

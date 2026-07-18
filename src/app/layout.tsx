@@ -60,12 +60,15 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    type: "website",
-    locale: "ar_AR",
-    url: baseUrl,
-    siteName: "يلا شوت نيو",
-    title: "يلا شوت نيو | Yalla Shoot New",
-    description: "تابع مباريات اليوم بث مباشر وتغطية حصرية لبطولة كأس العالم.",
+      type: "website",
+      locale: "ar_AR",
+      url: baseUrl,
+      siteName: "يلا شوت نيو",
+      title: "يلا شوت نيو | Yalla Shoot New",
+      description: "تابع مباريات اليوم بث مباشر وتغطية حصرية لبطولة كأس العالم.",
+    },
+  other: {
+    'og:site_name': 'يلا شوت نيو',
   },
   twitter: {
     card: "summary_large_image",
@@ -117,10 +120,19 @@ function StructuredData() {
         url: baseUrl,
         name: "يلا شوت نيو",
         alternateName: "Yalla Shoot New",
+        description: "منصة رياضية عربية متخصصة في بث المباريات والأخبار الرياضية",
         publisher: {
           "@id": `${baseUrl}/#organization`,
         },
         inLanguage: "ar",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${baseUrl}/search?q={search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
       },
     ],
   };
