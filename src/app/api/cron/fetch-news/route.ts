@@ -10,6 +10,40 @@ const RSS_FEEDS = [
   { url: 'https://www.winwin.com/rss', lang: 'ar' },
 ];
 
+// كلمات رياضية — يجب وجود كلمة واحدة على الأقل لاعتبار الخبر رياضياً
+const ARABIC_KEYWORDS = [
+  'كرة قدم', 'مباراة', 'هدف', 'نادي', 'دوري', 'كأس', 'بطولة',
+  'منتخب', 'لاعب', 'مدرب', 'حكم', 'ملعب', 'جمهور', 'صفقة',
+  'انتقال', 'تعاقد', 'تجديد', 'عقد', 'احتراف',
+  'الدوري المصري', 'الدوري السعودي', 'الدوري الإنجليزي',
+  'الأهلي', 'الزمالك', 'الهلال', 'النصر', 'الاتحاد',
+  'ريال مدريد', 'برشلونة', 'ليفربول', 'مانشستر', 'بايرن',
+  'محمد صلاح', 'كأس العالم', 'تصفيات', 'أمم أفريقيا',
+  'كرة عالمية', 'رياضة',
+];
+
+// كلمات ممنوعة — تمنع المقالات السياسية/العسكرية
+const EXCLUDED_KEYWORDS = [
+  'الجيش', 'القوات', 'غارة', 'قصف', 'مسيرة', 'صواريخ',
+  'مقتل', 'قتلى', 'جرحى',
+  'أوكرانيا', 'روسيا', 'بوتين',
+  'غزة', 'فلسطين', 'إسرائيل', 'نتنياهو',
+  'إيران', 'خامنئي',
+  'لافروف', 'بيسكوف', 'لوكاشينكو',
+  'ترامب', 'البيت الأبيض', 'فانس',
+  'ميا خليفة', 'الكوكايين',
+  'الاتحاد الأوروبي', 'الناتو',
+  'دعوى قضائية', 'محكمة',
+];
+
+function isFootballRelated(title: string): boolean {
+  const text = title.toLowerCase();
+  // أولاً: تحقق من الكلمات الممنوعة
+  if (EXCLUDED_KEYWORDS.some(kw => text.includes(kw))) return false;
+  // ثانياً: تحقق من الكلمات الرياضية
+  return ARABIC_KEYWORDS.some(kw => text.includes(kw));
+}
+
 async function downloadAndUploadImage(url: string, title: string): Promise<string | null> {
   try {
     // Download image
@@ -79,6 +113,12 @@ export async function GET(request: Request) {
           if (!item.title) continue;
           totalProcessed++;
 
+          // 🔍 فلترة: تحقق أن الخبر رياضي وليس سياسي/عسكري
+          if (!isFootballRelated(item.title)) {
+            console.log(`Skipped (non-sports): ${item.title.substring(0, 60)}`);
+            continue;
+          }
+
           // Extract image from multiple possible sources
           let imageUrl = null;
           if (item.enclosure?.url) {
@@ -106,10 +146,7 @@ export async function GET(request: Request) {
             let storageUrl = null;
             if (imageUrl) {
               storageUrl = await downloadAndUploadImage(imageUrl, item.title);
-              if (!storageUrl) {
-                // If upload fails, still store the external URL as fallback
-                storageUrl = imageUrl;
-              }
+              // If upload fails, DON'T store external URL — only Supabase URLs are reliable
             }
 
             // Generate slug from title
