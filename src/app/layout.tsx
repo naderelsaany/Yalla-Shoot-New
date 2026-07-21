@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   manifest: '/manifest.json',
   title: {
-    default: "يلا شوت نيو | بث مباشر مباريات اليوم بدون تقطيع Yalla Shoot",
+    default: "يلا شوت نيو | بث مباشر مباريات اليوم بدون تقطيع",
     template: "%s | يلا شوت نيو",
   },
   description: "يلا شوت نيو - تابع مباريات اليوم بث مباشر بدون تقطيع، نتائج المباريات لحظة بلحظة، أهداف اليوم، ترتيب الدوريات، وأحدث الأخبار الرياضية. تغطية حصرية لكأس العالم 2026، دوري أبطال أوروبا، الدوري الإنجليزي، الدوري المصري، والدوري السعودي.",
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
       locale: "ar_AR",
       url: baseUrl,
       siteName: "يلا شوت نيو",
-      title: "يلا شوت نيو | Yalla Shoot New",
+      title: "يلا شوت نيو | بث مباشر مباريات اليوم",
       description: "تابع مباريات اليوم بث مباشر وتغطية حصرية لبطولة كأس العالم.",
     },
   twitter: {
