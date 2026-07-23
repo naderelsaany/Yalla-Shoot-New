@@ -18,6 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title: 'الفرق الرياضية | يلا شوت نيو',
       description: 'جميع الفرق والمنتخبات في يلا شوت نيو',
       url: `${baseUrl}/teams`,
+      siteName: 'يلا شوت نيو',
+      locale: 'ar_AR',
+      type: 'website',
     },
   };
 }

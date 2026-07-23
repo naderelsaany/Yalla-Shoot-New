@@ -29,7 +29,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: `بطولة ${translatedName} على يلا شوت نيو — جدول المباريات، النتائج، الترتيب والإحصائيات.`,
     keywords: `${translatedName}, ${translatedName} 2026, نتائج ${translatedName}, مباريات ${translatedName}, ترتيب ${translatedName}`,
     alternates: { canonical: `${baseUrl}/league/${decodedSlug}` },
-    openGraph: { title: `${translatedName} | يلا شوت نيو`, url: `${baseUrl}/league/${decodedSlug}` },
+    openGraph: {
+      title: `${translatedName} | يلا شوت نيو`,
+      description: `جميع مباريات ${translatedName} على يلا شوت نيو`,
+      url: `${baseUrl}/league/${decodedSlug}`,
+      siteName: 'يلا شوت نيو',
+      locale: 'ar_AR',
+      type: 'website',
+    },
   };
 }
 

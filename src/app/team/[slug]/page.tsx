@@ -35,6 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: `جميع مباريات فريق ${translatedName} على يلا شوت نيو`,
       url: `${baseUrl}/team/${decodedSlug}`,
       type: 'profile',
+      siteName: 'يلا شوت نيو',
+      locale: 'ar_AR',
     },
   };
 }

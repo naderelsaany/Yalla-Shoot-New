@@ -29,6 +29,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       description: pageDesc,
       url: canonicalUrl,
       type: 'website',
+      siteName: 'يلا شوت نيو',
+      locale: 'ar_AR',
       images: [{ url: `${baseUrl}/icon-512.png`, width: 512, height: 512, alt: 'يلا شوت نيو' }],
     },
     twitter: {

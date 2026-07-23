@@ -13,7 +13,14 @@ export async function generateMetadata(): Promise<Metadata> {
     description: 'جميع البطولات والدوريات على يلا شوت نيو — كأس العالم، الدوري المصري، الدوري السعودي، دوري أبطال أوروبا والمزيد.',
     keywords: 'بطولات كرة قدم, دوريات, يلا شوت نيو, كأس العالم, دوري أبطال أوروبا, الدوري المصري, الدوري السعودي',
     alternates: { canonical: `${baseUrl}/leagues` },
-    openGraph: { title: 'البطولات | يلا شوت نيو', url: `${baseUrl}/leagues` },
+    openGraph: {
+      title: 'البطولات | يلا شوت نيو',
+      description: 'جميع البطولات والدوريات على يلا شوت نيو',
+      url: `${baseUrl}/leagues`,
+      siteName: 'يلا شوت نيو',
+      locale: 'ar_AR',
+      type: 'website',
+    },
   };
 }
 
