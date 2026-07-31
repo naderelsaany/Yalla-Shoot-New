@@ -52,6 +52,23 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 
 export const revalidate = 60; // ISR
 
+// Convert HTML entities + strip HTML tags for plain-text display
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#\d+;/g, ' ');
+}
+
+function plainText(s: string): string {
+  return decodeEntities(s.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+}
+
 function NewsBreadcrumbsStructuredData() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
   const breadcrumbData = {
@@ -141,7 +158,7 @@ export default async function NewsPage({ searchParams }: { searchParams: Promise
                     {news.title}
                   </h3>
                   <p className="text-sm text-[var(--color-text-secondary)] line-clamp-3 mb-4 flex-1">
-                    {news.content}
+                    {news.summary ? plainText(news.summary) : plainText(news.content || '').substring(0, 200)}
                   </p>
                   <span className="text-sm font-bold text-[var(--color-accent)] mt-auto self-start">
                     اقرأ التفاصيل ←

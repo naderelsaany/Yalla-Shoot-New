@@ -44,6 +44,22 @@ function isFootballRelated(title: string): boolean {
   return ARABIC_KEYWORDS.some(kw => text.includes(kw));
 }
 
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#\d+;/g, ' ');
+}
+
+function stripHtml(s: string): string {
+  return decodeEntities(s.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
+}
+
 async function downloadAndUploadImage(url: string, title: string): Promise<string | null> {
   try {
     // Download image
@@ -113,9 +129,12 @@ export async function GET(request: Request) {
           if (!item.title) continue;
           totalProcessed++;
 
+          // تنظيف العنوان: فك ترميز HTML entities
+          const cleanTitle = decodeEntities(item.title).trim();
+
           // 🔍 فلترة: تحقق أن الخبر رياضي وليس سياسي/عسكري
-          if (!isFootballRelated(item.title)) {
-            console.log(`Skipped (non-sports): ${item.title.substring(0, 60)}`);
+          if (!isFootballRelated(cleanTitle)) {
+            console.log(`Skipped (non-sports): ${cleanTitle.substring(0, 60)}`);
             continue;
           }
 
@@ -138,19 +157,19 @@ export async function GET(request: Request) {
           const { data: existingNews } = await supabase
             .from('news')
             .select('id')
-            .eq('title', item.title)
+            .eq('title', cleanTitle)
             .maybeSingle();
 
           if (!existingNews) {
             // Upload image to Supabase Storage before saving
             let storageUrl = null;
             if (imageUrl) {
-              storageUrl = await downloadAndUploadImage(imageUrl, item.title);
+              storageUrl = await downloadAndUploadImage(imageUrl, cleanTitle);
               // If upload fails, DON'T store external URL — only Supabase URLs are reliable
             }
 
             // Generate slug from title
-            const titleClean = item.title.replace(/\s+/g, '-').replace(/[^\w\u0600-\u06FF-]/g, '');
+            const titleClean = cleanTitle.replace(/\s+/g, '-').replace(/[^\w\u0600-\u06FF-]/g, '');
             const slug = titleClean + '-' + Date.now();
 
             const rawContent = (item.contentSnippet || item.content || '');
@@ -159,11 +178,14 @@ export async function GET(request: Request) {
               ? `<br><br><a href="${item.link}" target="_blank" rel="nofollow noopener" style="color: var(--color-accent); font-weight: bold;">اقرأ الخبر كاملاً من المصدر الرسمي</a>` 
               : '';
             const content = excerpt + originalLink;
+            // ملخص نصي نظيف (بدون HTML) للعرض في البطاقات
+            const summary = stripHtml(excerpt).substring(0, 160);
 
             const { error } = await supabase.from('news').insert({
-              title: item.title,
+              title: cleanTitle,
               slug: slug,
               content: content,
+              summary: summary,
               image_url: storageUrl,
               published_at: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
             });

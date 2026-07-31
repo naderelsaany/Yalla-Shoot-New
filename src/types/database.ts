@@ -46,6 +46,7 @@ export interface News {
   title: string;
   slug: string;
   content?: string | null;
+  summary?: string | null;
   image_url?: string | null;
   source?: string | null;
   published_at: string;
