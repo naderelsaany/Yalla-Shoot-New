@@ -129,6 +129,33 @@ async function parseRSS(url) {
 }
 
 /**
+ * 🗜️ ضغط الصورة باستخدام sharp — تحويل للـ JPEG بجودة 80 وضبط العرض
+ * يرجع buffer مضغوط، أو البuffer الأصلي إذا فشل الضغط أو كان أكبر
+ */
+async function compressImage(buffer, contentType) {
+  try {
+    const sharp = require('sharp');
+    const ext = (contentType.split('/')[1] || 'jpeg').replace('jpeg', 'jpg');
+    let img = sharp(buffer, { failOn: 'none' }).rotate();
+    const meta = await img.metadata();
+    // لا تضغط الصور الصغيرة جداً
+    if (!meta.width) return buffer;
+    // ضبط العرض الأقصى 1280px
+    if (meta.width > 1280) {
+      img = img.resize({ width: 1280, withoutEnlargement: true });
+    }
+    let out;
+    if (ext === 'png') out = await img.png({ compressionLevel: 9 }).toBuffer();
+    else if (ext === 'webp') out = await img.webp({ quality: 80 }).toBuffer();
+    else out = await img.jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+    return out.length < buffer.length ? out : buffer;
+  } catch (e) {
+    console.error(`  ⚠️ فشل الضغط: ${e.message}`);
+    return buffer;
+  }
+}
+
+/**
  * تحميل الصورة من الرابط الخارجي ورفعها إلى Supabase Storage
  * ثم إرجاع رابط Supabase العام — أو null إذا فشلت العملية
  */
@@ -149,7 +176,7 @@ async function downloadAndUploadImage(imageUrl, title) {
       console.error(`  ⚠️ فشل تحميل الصورة (HTTP ${response.status})`);
       return null;
     }
-    const buffer = Buffer.from(await response.arrayBuffer());
+    let buffer = Buffer.from(await response.arrayBuffer());
     
     // Skip if too large (>4MB)
     if (buffer.length > 4 * 1024 * 1024) {
@@ -158,6 +185,16 @@ async function downloadAndUploadImage(imageUrl, title) {
     }
     
     const contentType = response.headers.get('content-type') || 'image/jpeg';
+    
+    // 🗜️ Compress images > 300KB with sharp to keep storage lean (SEO + speed)
+    if (buffer.length > 300 * 1024) {
+      const compressed = await compressImage(buffer, contentType);
+      if (compressed && compressed.length < buffer.length) {
+        console.log(`  🗜️ مضغوطة: ${(buffer.length / 1024 / 1024).toFixed(2)}MB → ${(compressed.length / 1024 / 1024).toFixed(2)}MB`);
+        buffer = compressed;
+      }
+    }
+    
     const ext = contentType.split('/')[1] || 'jpg';
     
     // Generate safe filename
@@ -230,8 +267,18 @@ async function main() {
       const normalizedTitle = item.title?.trim()?.toLowerCase();
       if (normalizedTitle && existingTitles.has(normalizedTitle)) { feedSkipped++; feedDuplicates++; continue; }
       
-      // Clean title (remove CDATA)
-      const cleanTitle = item.title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+      // Clean title (remove CDATA + decode HTML entities)
+      const cleanTitle = item.title
+        .replace(/<!\[CDATA\[|\]\]>/g, '')
+        .replace(/&quot;/g, '"')
+        .replace(/&#0?39;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&#\d+;/g, ' ')
+        .trim();
       
       // Clean description - strip HTML
       const cleanDesc = (item.description || '')
