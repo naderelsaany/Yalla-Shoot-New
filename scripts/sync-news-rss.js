@@ -38,18 +38,58 @@ const ARABIC_KEYWORDS = [
   'الدوري المصري', 'الدوري السعودي', 'الدوري الإنجليزي',
   'الأهلي', 'الزمالك', 'الهلال', 'النصر', 'الاتحاد',
   'ريال مدريد', 'برشلونة', 'ليفربول', 'مانشستر', 'بايرن',
-  'محمد صلاح', 'كأس العالم', 'تصفيات', 'أمم أفريقيا',
+  'محمد صلاح', 'كأس العالم', 'مونديال', 'تصفيات', 'أمم أفريقيا',
   'كرة عالمية', 'رياضة', '进球', '足球',
+];
+
+// كلمات ممنوعة — تمنع المقالات السياسية/العسكرية التي تعبر الفلتر أعلاه
+const EXCLUDED_KEYWORDS = [
+  // عسكري وسياسي
+  'الجيش الأمريكي', 'الجيش الإيراني', 'الجيش الروسي', 'القوات الروسية',
+  'غارة جوية', 'ضربات جوية', 'قصف', 'مسيرات', 'صواريخ', 'هجمات',
+  'مقتل', 'قتلى', 'قتيل', 'جرحى', 'إصابة', 'المصابين', 'قنابل',
+  'أوكرانيا', 'روسيا', 'بوتين', 'زيلينسكي',
+  'غزة', 'فلسطين', 'إسرائيل', 'نتنياهو', 'الضفة', 'لبنان', 'حزب الله',
+  'الحوثي', 'الحوثيون', 'اليمن', 'صنعاء',
+  'إيران', 'خامنئي', 'باسداران', 'طهران',
+  'سوريا', 'دمشق', 'درعا', 'حمص', 'اللاذقية', 'حلب', 'إعزاز',
+  // شخصيات غير رياضية
+  'لافروف', 'بيسكوف', 'لوكاشينكو', 'زاخاروفا', 'بيسكوفا',
+  'ترامب', 'رئيس أمريكا', 'البيت الأبيض', 'فانس',
+  // 'إنفانتينو' intentionally removed — he IS football-related (FIFA president)
+  // غير رياضي بحت
+  'ميا خليفة', 'الكوكايين', 'مغن شهير',
+  'جوديت بولغار', 'هنغاريا', 'الشطرنج',
+  'محاولة اغتيال', 'مبنى فيدرالي',
+  // سياسة دولية وقضاء
+  'الاتحاد الأوروبي', 'الناتو', 'الأمم المتحدة',
+  'دعوى قضائية', 'محكمة جنائية', 'الجنائية الدولية', 'المحكمة الجنائية',
+  'المدعي العام', 'القضاء الدولي', 'عزل المدعي',
+  'مبيعات الأسلحة', 'عقوبات',
+  // أخبار غير رياضية
+  'ألعاب القوى',  // athletics — not football
+  // غير رياضي — مشاهد/اقتصاد/مجتمع
+  'عارضة أزياء', 'خطيبها الملياردير', 'احتيال مزعوم',
+  'رسوما على مغادري', 'مغادري البلاد', 'الجريدة الرسمية',
+  'انفصال عارضة',
 ];
 
 function isFootballRelated(title, content) {
   const text = (title + ' ' + (content || '')).toLowerCase();
+  
+  // أولاً: تحقق من الكلمات الممنوعة (non-sports)
+  const hasExcluded = EXCLUDED_KEYWORDS.some(kw => text.includes(kw));
+  if (hasExcluded) return false;
+  
+  // ثانياً: تحقق من الكلمات الرياضية
   return ARABIC_KEYWORDS.some(kw => text.includes(kw));
 }
 
 function generateSlug(title) {
   const safe = title.replace(/[^\w\u0600-\u06FF\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 80);
-  return safe + '-' + Date.now().toString(36);
+  // Use title hash + short timestamp instead of Date.now() to allow dedup
+  const hash = crypto.createHash('md5').update(title).digest('hex').substring(0, 8);
+  return `${safe}-${hash}`;
 }
 
 async function parseRSS(url) {
@@ -96,7 +136,15 @@ async function downloadAndUploadImage(imageUrl, title) {
   if (!imageUrl) return null;
   try {
     console.log(`  📥 تحميل صورة: ${imageUrl.substring(0, 60)}...`);
-    const response = await fetch(imageUrl, { signal: AbortSignal.timeout(10000) });
+    const response = await fetch(imageUrl, {
+      signal: AbortSignal.timeout(15000),
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        'Accept-Language': 'ar,en;q=0.9',
+        'Referer': 'https://www.winwin.com/',
+      }
+    });
     if (!response.ok) {
       console.error(`  ⚠️ فشل تحميل الصورة (HTTP ${response.status})`);
       return null;
@@ -129,6 +177,12 @@ async function downloadAndUploadImage(imageUrl, title) {
       return null;
     }
     
+    // Verify the upload by checking size
+    const { data: uploadedInfo } = await supabase.storage.from('news-images').list('', { search: fileName });
+    if (uploadedInfo && uploadedInfo.length > 0) {
+      console.log(`  ✅ تم رفع الصورة (${(uploadedInfo[0].metadata?.size || buffer.length) / 1024 / 1024 | 0}MB): ${fileName}`);
+    }
+    
     const { data: urlData } = supabase.storage.from('news-images').getPublicUrl(fileName);
     console.log(`  ✅ تم رفع الصورة إلى Supabase: ${fileName}`);
     return urlData.publicUrl;
@@ -144,9 +198,10 @@ async function main() {
   let totalSkipped = 0;
   let totalImagesUploaded = 0;
   
-  // Get existing slugs to avoid duplicates
-  const { data: existingNews } = await supabase.from('news').select('slug').limit(500);
+  // Get existing slugs AND titles to avoid duplicates
+  const { data: existingNews } = await supabase.from('news').select('slug, title').limit(5000);
   const existingSlugs = new Set(existingNews?.map(n => n.slug) || []);
+  const existingTitles = new Set(existingNews?.map(n => n.title?.trim()?.toLowerCase()) || []);
   console.log(`📊 الأخبار الموجودة: ${existingSlugs.size}\n`);
   
   for (const feed of RSS_FEEDS) {
@@ -156,17 +211,24 @@ async function main() {
     
     let feedAdded = 0;
     let feedSkipped = 0;
+    let feedNotFootball = 0;
+    let feedDuplicates = 0;
     
     for (const item of items) {
       // Check if football related
       if (!isFootballRelated(item.title, item.description)) {
         feedSkipped++;
+        feedNotFootball++;
         continue;
       }
       
       // Generate unique slug
       const slug = generateSlug(item.title);
-      if (existingSlugs.has(slug)) { feedSkipped++; continue; }
+      if (existingSlugs.has(slug)) { feedSkipped++; feedDuplicates++; continue; }
+      
+      // Also check by title to prevent cross-feed duplicates
+      const normalizedTitle = item.title?.trim()?.toLowerCase();
+      if (normalizedTitle && existingTitles.has(normalizedTitle)) { feedSkipped++; feedDuplicates++; continue; }
       
       // Clean title (remove CDATA)
       const cleanTitle = item.title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
@@ -197,7 +259,7 @@ async function main() {
         title: cleanTitle.substring(0, 200),
         slug,
         content: cleanDesc,
-        image_url: storageUrl || item.image || null,  // Use Storage URL if available, else external as fallback
+        image_url: storageUrl || null,  // ONLY Supabase Storage URLs - no external URLs
         published_at: pubDate.toISOString(),
         summary: cleanDesc.substring(0, 160),
       };
@@ -209,13 +271,20 @@ async function main() {
       }
       
       existingSlugs.add(slug);
+      if (normalizedTitle) existingTitles.add(normalizedTitle);
       feedAdded++;
       totalAdded++;
       console.log(`  ✅ ${cleanTitle.substring(0, 60)}`);
     }
     
     if (feedAdded === 0 && feedSkipped > 0) {
-      console.log(`  ⏭️ ${feedSkipped} خبر غير رياضي`);
+      if (feedNotFootball > 0 && feedDuplicates === 0) {
+        console.log(`  ⏭️ ${feedNotFootball} خبر غير رياضي`);
+      } else if (feedDuplicates > 0 && feedNotFootball === 0) {
+        console.log(`  🔄 ${feedDuplicates} خبر موجود بالفعل`);
+      } else {
+        console.log(`  ⏭️ ${feedNotFootball} غير رياضي, 🔄 ${feedDuplicates} مكرر`);
+      }
     }
     console.log(`  📊 +${feedAdded} جديد, ${feedSkipped} متخطى\n`);
   }

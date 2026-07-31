@@ -89,12 +89,10 @@ function HomeStructuredData({ matches }: { matches: MatchWithTeams[] }) {
 const getRecentTime = () => new Date(Date.now() - 48 * 60 * 60 * 1000);
 
 export default async function Home() {
-  // Fetch recent and upcoming matches (starting from 14 hours ago to cover today's finished matches)
+  // Fetch upcoming/live matches FIRST (ascending), then fill remaining slots with recent finished (per Match Rules)
   const recentTime = getRecentTime();
 
-  const { data: matchesData } = await supabase
-    .from('matches')
-    .select(`
+  const MATCH_SELECT = `
       id,
       slug,
       match_date,
@@ -104,32 +102,38 @@ export default async function Home() {
       home_team:teams!matches_home_team_id_fkey(name, logo_url),
       away_team:teams!matches_away_team_id_fkey(name, logo_url),
       league:leagues(name)
-    `)
-    .gte('match_date', recentTime.toISOString())
+    `;
+
+  const { data: upcomingData } = await supabase
+    .from('matches')
+    .select(MATCH_SELECT)
+    .neq('status', 'FINISHED')
     .order('match_date', { ascending: true })
     .limit(15);
 
-  let matches = matchesData as unknown as MatchWithTeams[] | null;
+  let matches = (upcomingData || []) as unknown as MatchWithTeams[];
+
+  // Fill remaining slots with recent finished matches (last 48h, newest first)
+  if (matches.length < 15) {
+    const { data: finishedData } = await supabase
+      .from('matches')
+      .select(MATCH_SELECT)
+      .eq('status', 'FINISHED')
+      .gte('match_date', recentTime.toISOString())
+      .order('match_date', { ascending: false })
+      .limit(15 - matches.length);
+    matches = [...matches, ...((finishedData || []) as unknown as MatchWithTeams[])];
+  }
 
   // Fallback: If no upcoming/recent matches exist in the DB, fetch the latest past matches so the homepage is never empty.
   if (!matches || matches.length === 0) {
     const { data: fallbackData } = await supabase
       .from('matches')
-      .select(`
-        id,
-        slug,
-        match_date,
-        status,
-        home_score,
-        away_score,
-        home_team:teams!matches_home_team_id_fkey(name, logo_url),
-        away_team:teams!matches_away_team_id_fkey(name, logo_url),
-        league:leagues(name)
-      `)
+      .select(MATCH_SELECT)
       .order('match_date', { ascending: false })
       .limit(15);
       
-    matches = fallbackData as unknown as MatchWithTeams[] | null;
+    matches = (fallbackData || []) as unknown as MatchWithTeams[];
   }
 
   return (
