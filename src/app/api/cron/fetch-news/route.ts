@@ -60,6 +60,28 @@ function stripHtml(s: string): string {
   return decodeEntities(s.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
 }
 
+/** 🗜️ Compress image with sharp — JPEG q80, max width 1280px. Returns smaller buffer or original. */
+async function compressImage(buffer: Buffer, contentType: string): Promise<Buffer | null> {
+  try {
+    const sharp = (await import('sharp')).default;
+    const ext = (contentType.split('/')[1] || 'jpeg').replace('jpeg', 'jpg');
+    let img = sharp(buffer, { failOn: 'none' }).rotate();
+    const meta = await img.metadata();
+    if (!meta.width) return buffer;
+    if (meta.width > 1280) {
+      img = img.resize({ width: 1280, withoutEnlargement: true });
+    }
+    let out: Buffer;
+    if (ext === 'png') out = await img.png({ compressionLevel: 9 }).toBuffer();
+    else if (ext === 'webp') out = await img.webp({ quality: 80 }).toBuffer();
+    else out = await img.jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+    return out.length < buffer.length ? out : buffer;
+  } catch (e) {
+    console.error(`Compression failed: ${e}`);
+    return buffer;
+  }
+}
+
 async function downloadAndUploadImage(url: string, title: string): Promise<string | null> {
   try {
     // Download image
@@ -68,7 +90,7 @@ async function downloadAndUploadImage(url: string, title: string): Promise<strin
       console.error(`Image download failed: ${response.status} for ${url.substring(0, 80)}`);
       return null;
     }
-    const buffer = Buffer.from(await response.arrayBuffer());
+    let buffer: Buffer = Buffer.from(await response.arrayBuffer());
     
     // Skip if too large (>4MB)
     if (buffer.length > 4 * 1024 * 1024) {
@@ -77,6 +99,16 @@ async function downloadAndUploadImage(url: string, title: string): Promise<strin
     }
     
     const contentType = response.headers.get('content-type') || 'image/jpeg';
+    
+    // 🗜️ Compress images > 300KB with sharp (keep storage lean + faster pages)
+    if (buffer.length > 300 * 1024) {
+      const compressed = await compressImage(buffer, contentType);
+      if (compressed && compressed.length < buffer.length) {
+        console.log(`Image compressed: ${(buffer.length / 1048576).toFixed(2)}MB → ${(compressed.length / 1048576).toFixed(2)}MB`);
+        buffer = compressed;
+      }
+    }
+    
     const ext = contentType.split('/')[1] || 'jpg';
     
     // Generate safe filename
