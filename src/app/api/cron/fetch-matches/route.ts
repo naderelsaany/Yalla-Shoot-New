@@ -209,6 +209,14 @@ export async function GET(request: Request) {
 
         const matchDateISO = match.datestart.replace(' ', 'T') + 'Z';
 
+        // ⏭️ Skip finished matches older than 48h (site freshness policy — they were cleaned up)
+        if (status === 'FINISHED') {
+          const matchTime = new Date(matchDateISO).getTime();
+          if (Date.now() - matchTime > 48 * 60 * 60 * 1000) {
+            continue;
+          }
+        }
+
         // Check if match exists
         const { data: existingMatch } = await supabase
           .from('matches')
