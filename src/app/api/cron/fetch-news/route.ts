@@ -27,6 +27,9 @@ const EXCLUDED_KEYWORDS = [
   'الجيش', 'القوات', 'غارة', 'قصف', 'مسيرة', 'صواريخ',
   'مقتل', 'قتلى', 'جرحى',
   'أوكرانيا', 'روسيا', 'بوتين',
+  'روسية', 'الروسية', 'أوكرانية', 'الأوكرانية',
+  'الدفاع الروسية', 'وزارة الدفاع', 'سوبيانين', 'البحر الأسود',
+  'دمياط', 'منشأة تخزين', 'ناقلة للشحنات', 'مسيّرة',
   'غزة', 'فلسطين', 'إسرائيل', 'نتنياهو',
   'إيران', 'خامنئي',
   'لافروف', 'بيسكوف', 'لوكاشينكو',
@@ -98,6 +101,17 @@ async function downloadAndUploadImage(url: string, title: string): Promise<strin
       return null;
     }
     
+    // 🛡️ فحص الترويسة (magic bytes) — يرفض الملفات التالفة/غير الصورية
+    // (2026-08-01: ملفات تبدأ بـ EF BF BD (U+FFFD) رُفعت وظهرت مكسورة في الموقع)
+    const isJpeg = buffer.length > 3 && buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF;
+    const isPng  = buffer.length > 4 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47;
+    const isGif  = buffer.length > 3 && buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46;
+    const isWebp = buffer.length > 12 && buffer.toString('latin1', 0, 4) === 'RIFF' && buffer.toString('latin1', 8, 12) === 'WEBP';
+    if (!isJpeg && !isPng && !isGif && !isWebp) {
+      console.error(`Invalid image magic bytes (${buffer.subarray(0, 8).toString('hex')}) — rejected`);
+      return null;
+    }
+    
     const contentType = response.headers.get('content-type') || 'image/jpeg';
     
     // 🗜️ Compress images > 300KB with sharp (keep storage lean + faster pages)
@@ -109,7 +123,8 @@ async function downloadAndUploadImage(url: string, title: string): Promise<strin
       }
     }
     
-    const ext = contentType.split('/')[1] || 'jpg';
+    const extRaw = contentType.split('/')[1] || 'jpg';
+    const ext = extRaw === 'jpeg' ? 'jpg' : extRaw === 'svg' ? 'svg+xml' : extRaw;
     
     // Generate safe filename
     const hash = crypto.createHash('md5').update(title + Date.now()).digest('hex').substring(0, 8);
@@ -198,6 +213,13 @@ export async function GET(request: Request) {
             if (imageUrl) {
               storageUrl = await downloadAndUploadImage(imageUrl, cleanTitle);
               // If upload fails, DON'T store external URL — only Supabase URLs are reliable
+            }
+            
+            // 🛡️ القاعدة الإلزامية: كل خبر لازم يكون له صورة من Supabase Storage
+            // إذا فشل التحميل/الرفع → تخطَّ الخبر كاملاً (لا ندرج بدون صورة)
+            if (!storageUrl) {
+              console.log(`Skipped (image failed): ${cleanTitle.substring(0, 60)}`);
+              continue;
             }
 
             // Generate slug from title

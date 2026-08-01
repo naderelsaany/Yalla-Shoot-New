@@ -53,6 +53,10 @@ const EXCLUDED_KEYWORDS = [
   'الحوثي', 'الحوثيون', 'اليمن', 'صنعاء',
   'إيران', 'خامنئي', 'باسداران', 'طهران',
   'سوريا', 'دمشق', 'درعا', 'حمص', 'اللاذقية', 'حلب', 'إعزاز',
+  // مفرد المسيرات والصفات الروسية/الأوكرانية (تسربت في 2026-08-01)
+  'مسيرة', 'مسيّرة', 'سوبيانين', 'البحر الأسود', 'دمياط',
+  'منشأة تخزين', 'ناقلة للشحنات', 'الدفاع الروسية', 'وزارة الدفاع',
+  'روسية', 'الروسية', 'أوكرانية', 'الأوكرانية', 'أوكرانيا', 'روسيا',
   // شخصيات غير رياضية
   'لافروف', 'بيسكوف', 'لوكاشينكو', 'زاخاروفا', 'بيسكوفا',
   'ترامب', 'رئيس أمريكا', 'البيت الأبيض', 'فانس',
@@ -184,6 +188,17 @@ async function downloadAndUploadImage(imageUrl, title) {
       return null;
     }
     
+    // 🛡️ فحص الترويسة (magic bytes) — يرفض الملفات التالفة/غير الصورية
+    // (في 2026-08-01: ملفات تبدأ بـ EF BF BD (U+FFFD) رُفعت وظهرت مكسورة في الموقع)
+    const isJpeg = buffer.length > 3 && buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF;
+    const isPng  = buffer.length > 4 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47;
+    const isGif  = buffer.length > 3 && buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46;
+    const isWebp = buffer.length > 12 && buffer.toString('latin1', 0, 4) === 'RIFF' && buffer.toString('latin1', 8, 12) === 'WEBP';
+    if (!isJpeg && !isPng && !isGif && !isWebp) {
+      console.error(`  ⚠️ الملف ليس صورة صالحة (أول 8 بايت: ${buffer.subarray(0, 8).toString('hex')}) — تم التجاهل`);
+      return null;
+    }
+    
     const contentType = response.headers.get('content-type') || 'image/jpeg';
     
     // 🗜️ Compress images > 300KB with sharp to keep storage lean (SEO + speed)
@@ -293,6 +308,14 @@ async function main() {
       if (item.image) {
         storageUrl = await downloadAndUploadImage(item.image, cleanTitle);
         if (storageUrl) totalImagesUploaded++;
+      }
+      
+      // 🛡️ القاعدة الإلزامية: كل خبر لازم يكون له صورة من Supabase Storage
+      // إذا فشل التحميل/الرفع → تخطَّ الخبر كاملاً (لا ندرج بدون صورة)
+      if (!storageUrl) {
+        feedSkipped++;
+        console.log(`  ⏭️ تخطي (فشل صورة): ${cleanTitle.substring(0, 50)}`);
+        continue;
       }
       
       // Parse date

@@ -49,3 +49,4 @@ bundle_code.py
 
 .vercel
 .env*
+scripts/migrate-images.log
