@@ -129,9 +129,12 @@ async function downloadAndUploadImage(url: string, title: string): Promise<strin
     const extRaw = contentType.split('/')[1] || 'jpg';
     const ext = extRaw === 'jpeg' ? 'jpg' : extRaw === 'svg' ? 'svg+xml' : extRaw;
     
-    // Generate safe filename
+    // Generate safe filename — unique per process (random suffix prevents parallel-run collisions:
+    // two runs on the same title+millisecond would otherwise produce the SAME filename, and the
+    // loser's orphan-cleanup would delete the winner's referenced image — see 2026-08-07 incident)
     const hash = crypto.createHash('md5').update(title + Date.now()).digest('hex').substring(0, 8);
-    const fileName = `news-${hash}-${Date.now()}.${ext}`;
+    const rand = crypto.randomBytes(4).toString('hex');
+    const fileName = `news-${hash}-${Date.now()}-${rand}.${ext}`;
     
     // Upload to Supabase Storage
     const supabase = getServiceSupabase();
