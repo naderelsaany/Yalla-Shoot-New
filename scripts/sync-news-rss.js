@@ -80,10 +80,25 @@ const EXCLUDED_KEYWORDS = [
   'عارضة أزياء', 'خطيبها الملياردير', 'احتيال مزعوم',
   'رسوما على مغادري', 'مغادري البلاد', 'الجريدة الرسمية',
   'انفصال عارضة',
+  // 🔧 2026-08-08: تسريبات RT العامة (سياسة/مجتمع/علوم) التي عبرت الفلتر
+  // ملاحظة: 'حكم' (حكم مباراة) يطابق 'حكومي'/'حكومة' — نستبعد المشتقات الحكومية
+  'حكومي', 'حكومة', 'الحكومة', 'محكمة', 'النيابة العامة',
+  'قيس سعيد', 'الرئيس التونسي', 'رئيس الوزراء', 'وزير الخارجية', 'وزارة',
+  'بيان رسمي', 'بيان حكومي',
+  'المهاجرين', 'أعمال شغب', 'احتجاج', 'مظاهرات', 'التحية النازية',
+  'نظام مائي', 'الهرم الأحمر', 'بناء الأهرامات', 'الآثار',
+  'الجودو', 'الفورمولا', 'سومو', 'الشطرنج', 'كرة السلة', 'كرة الطائرة', 'تنس',
+  'مؤتمر لبحث', 'تحالف', 'واشنطن ولندن',
 ];
 
 function isFootballRelated(title, content) {
-  const text = (title + ' ' + (content || '')).toLowerCase();
+  // نظّف الوصف من HTML قبل الفحص (روابط/تيزرات التنقل تسرّب كلمات رياضية)
+  const cleanContent = (content || '')
+    .replace(/<!\[CDATA\[|\]\]>/g, '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&[^;]+;/g, ' ')
+    .replace(/\s+/g, ' ');
+  const text = (title + ' ' + cleanContent).toLowerCase();
   
   // أولاً: تحقق من الكلمات الممنوعة (non-sports)
   const hasExcluded = EXCLUDED_KEYWORDS.some(kw => text.includes(kw));
@@ -299,6 +314,20 @@ async function main() {
         .replace(/&#\d+;/g, ' ')
         .trim();
       
+      // 🕐 فحص التاريخ قبل رفع الصورة — نمنع إدراج أخبار قديمة (>15 يوم)
+      // (في 2026-08-08: الفيدات أعادت إدراج أخبار نهائي المونديال 19 يوليو = 20 يوم)
+      let pubDate = new Date();
+      if (item.pubDate) {
+        const parsed = new Date(item.pubDate);
+        if (!isNaN(parsed.getTime())) pubDate = parsed;
+      }
+      const MAX_AGE_MS = 15 * 24 * 3600 * 1000; // 15 يوم — نفس سياسة التنظيف
+      if (Date.now() - pubDate.getTime() > MAX_AGE_MS) {
+        feedSkipped++;
+        console.log(`  ⏭️ قديم (>15 يوم): ${cleanTitle.substring(0, 50)}`);
+        continue;
+      }
+      
       // Clean description - strip HTML
       const cleanDesc = (item.description || '')
         .replace(/<!\[CDATA\[|\]\]>/g, '')
@@ -320,13 +349,6 @@ async function main() {
         feedSkipped++;
         console.log(`  ⏭️ تخطي (فشل صورة): ${cleanTitle.substring(0, 50)}`);
         continue;
-      }
-      
-      // Parse date
-      let pubDate = new Date();
-      if (item.pubDate) {
-        const parsed = new Date(item.pubDate);
-        if (!isNaN(parsed.getTime())) pubDate = parsed;
       }
       
       const newsItem = {
