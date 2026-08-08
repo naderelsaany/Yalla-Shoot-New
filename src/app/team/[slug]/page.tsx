@@ -10,7 +10,7 @@ import { Match, Team } from '@/types/database';
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  const { data: teams } = await supabase.from('teams').select('name').limit(200);
+  const { data: teams } = await supabase.from('teams').select('name').limit(500);
   return teams?.map(team => ({ slug: generateSlug(team.name) })) || [];
 }
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://yalla-shoot-new.vercel.app';
 
   // Find team by reverse slug matching
-  const { data: teams } = await supabase.from('teams').select('id, name').limit(200);
+  const { data: teams } = await supabase.from('teams').select('id, name').limit(500);
   const team = teams?.find(t => generateSlug(t.name) === decodedSlug);
   if (!team) return { title: 'فريق غير موجود' };
 
@@ -46,7 +46,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
   const decodedSlug = decodeURIComponent(slug);
 
   // Find team
-  const { data: teams } = await supabase.from('teams').select('*').limit(200);
+  const { data: teams } = await supabase.from('teams').select('*').limit(500);
   const team = teams?.find(t => generateSlug(t.name) === decodedSlug);
   if (!team) notFound();
 

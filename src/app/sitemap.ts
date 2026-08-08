@@ -11,8 +11,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch dynamic routes
   const { data: matches } = await supabase.from('matches').select('id, slug, updated_at, created_at, match_date, status');
   const { data: news } = await supabase.from('news').select('slug, updated_at');
-  const { data: teams } = await supabase.from('teams').select('id, name, updated_at').limit(200);
-  const { data: leagues } = await supabase.from('leagues').select('id, name, updated_at').limit(30);
+  const { data: teams } = await supabase.from('teams').select('id, name, updated_at').limit(500);
+  const { data: leagues } = await supabase.from('leagues').select('id, name, updated_at').limit(100);
 
   const now = new Date();
   const weekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
